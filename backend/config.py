@@ -8,21 +8,22 @@ class Config:
     # Flask
     SECRET_KEY = os.getenv("SECRET_KEY", "nexus-secret-key-change-in-production")
     
+    # JWT Configuration (Strong Auth)
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "nexus-jwt-secret-key-change-in-production")
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=3)  # STRICT 3-hour session
+    JWT_TOKEN_LOCATION = ["headers"]
+    
     # MongoDB
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "nexus_game")
     
-    # Session Configuration
-    SESSION_COOKIE_NAME = "nexus_session"
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = False  # Set True in production with HTTPS
-    SESSION_COOKIE_SAMESITE = "Lax"
-    SESSION_EXPIRY_HOURS = 2  # Session expires after 2 hours of inactivity
+    # Game Mechanics
+    POINTS_FLAG = 100
+    POINTS_ANSWER = 500  # Bonus for solving Question -> Stone
     
-    # Game Configuration
     AVENGERS = ["ironman", "thor", "hulk", "captainamerica", "blackwidow", "hawkeye"]
     
-    # Stone to Avenger mapping
+    # Stone Mapping
     STONE_MAPPING = {
         "ironman": "power",
         "thor": "space",
@@ -32,14 +33,10 @@ class Config:
         "hawkeye": "reality"
     }
     
-    # Puzzle Sequences
-    THOR_RUNE_SEQUENCE = [4, 1, 8, 3]  # Correct order for Thor's runes
-    
     # Anti-Cheat Configuration
-    MAX_ATTEMPTS_PER_AVENGER = 5  # Max wrong attempts before cooldown
-    COOLDOWN_DURATION_MINUTES = 5  # Cooldown after max attempts
-    RATE_LIMIT_FLAG_SUBMISSIONS = "10 per minute"  # Per session
-    MIN_COMPLETION_TIME_SECONDS = 10  # Flags completed faster = suspicious
+    MAX_ATTEMPTS_FLAG = 5
+    MAX_ATTEMPTS_QUESTION = 3
+    COOLDOWN_MINUTES = 10
     
     # Rate Limiting
     RATELIMIT_DEFAULT = "100 per hour"
