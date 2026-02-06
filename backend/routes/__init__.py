@@ -1,5 +1,4 @@
-# Routes package
-from routes.auth import auth_bp
-from routes.flags import flags_bp
-from routes.leaderboard import leaderboard_bp
-from routes.admin import admin_bp
+# NEXUS Routes package
+from routes.avenger import avenger_bp
+from routes.game import game_bp
+from routes.nexus import nexus_bp
