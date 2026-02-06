@@ -1,8 +1,10 @@
-# Models package
+# NEXUS Models package
 from models.database import (
     db,
-    users_collection,
-    flags_collection,
-    submissions_collection,
-    init_db
+    sessions_collection,
+    game_flags_collection,
+    analytics_collection,
+    init_db,
+    seed_game_flags,
+    cleanup_expired_sessions
 )
