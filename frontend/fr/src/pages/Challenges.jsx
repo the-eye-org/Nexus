@@ -28,7 +28,7 @@ const HERO_CHALLENGES = [
 // Static file routes per avenger (served from FR public under /nexus)
 // Update paths as you add static folders/files for each hero
 const CHALLENGE_LINKS = {
-  cap: '/nexus/cap/index.html',
+  cap: '/nexus/captain_america/index.html',
   thor: '/nexus/thor/index.html',
   ironman: '/nexus/ironman/index.html',
   deadpool: '/nexus/deadpool/index.html',
