@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../nexus/src/context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './HulkFinal.css';
 
 const HulkFinal = () => {
   const navigate = useNavigate();
-  const { token, user } = useAuth(); // Get auth context
+  const { user } = useAuth(); // Get auth context from FR
+  const token = user?.token;
   const [flag, setFlag] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -33,16 +34,13 @@ const HulkFinal = () => {
 
     try {
       // Get API URL from environment or use default
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const API_URL = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
       
       // Submit to backend API with authentication
       const response = await axios.post(
-        `${API_URL}/submit-flag`,
+        `${API_URL}/game/submit-flag`,
         {
-          character: 'hulk',
           flag: flag.trim(),
-          stone: 'time_stone',
-          userId: user?.id || user?._id // Support both id formats
         },
         {
           headers: {
@@ -56,7 +54,7 @@ const HulkFinal = () => {
         setSuccess(true);
         // Redirect to dashboard after delay
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/leaderboard');
         }, 5000);
       } else {
         setError(response.data.message || 'Invalid flag. Try again.');
@@ -211,13 +209,13 @@ const HulkFinal = () => {
       <div className="final-navigation">
         <button 
           className="nav-button secondary"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/leaderboard')}
         >
           📊 View Dashboard
         </button>
         <button 
           className="nav-button primary"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/challenges')}
         >
           🎭 Back to Challenges
         </button>

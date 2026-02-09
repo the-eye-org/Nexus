@@ -5,6 +5,8 @@ import { TiLocationArrow } from 'react-icons/ti';
 import { HiChevronLeft, HiChevronRight, HiX, HiLockClosed } from 'react-icons/hi';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
 
 // Import images from src/assets so Vite resolves URLs (works in dev and production)
 import imgCa from '../assets/img/ca.webp';
@@ -63,6 +65,7 @@ const Challenges = () => {
   const [direction, setDirection] = useState(0);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [flagInput, setFlagInput] = useState('');
+  const { user } = useAuth();
 
   const goPrev = () => {
     setDirection(-1);
@@ -85,9 +88,25 @@ const Challenges = () => {
     setFlagInput('');
   };
 
-  const handleSubmitFlag = (e) => {
+  const handleSubmitFlag = async (e) => {
     e.preventDefault();
-    alert('Flag submission will be wired to your backend. You entered: ' + flagInput);
+    const token = user?.token;
+    if (!token) {
+      alert('You must be logged in to submit flags.');
+      return;
+    }
+    if (!flagInput.trim()) {
+      alert('Please enter a flag.');
+      return;
+    }
+    const res = await api.submitFlag(flagInput.trim(), token);
+    if (!res.ok) {
+      alert(res.error || 'Submission failed');
+      return;
+    }
+    const msg = res.data?.message || 'Flag accepted';
+    const q = res.data?.question;
+    alert(q ? `${msg}\n\nQuestion: ${q}` : msg);
   };
 
   return (
@@ -292,11 +311,23 @@ const Challenges = () => {
                     </p>
                   </div>
 
-                  <div className="mt-auto bg-white/5 rounded-xl p-5 border border-white/10">
+                  <div className="mt-auto bg-white/5 rounded-xl p-5 border border-white/10 relative">
                     <div className="flex items-center gap-2 mb-3 text-marvel-red">
                       <HiLockClosed />
                       <span className="text-xs font-bold uppercase tracking-widest">Security Protocol</span>
                     </div>
+
+                    {/* Quick access: open external challenge for non-Hulk */}
+                    {selectedChallenge.id !== 'hulk' && (
+                      <a
+                        href="/nexus/ironman/index.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute right-1.5 -top-10 px-4 bg-marvel-red hover:bg-marvel-red-dark text-white text-xs font-bold uppercase rounded-md transition-colors"
+                      >
+                        Enter Challenge
+                      </a>
+                    )}
 
                     <form onSubmit={handleSubmitFlag} className="relative">
                       <input

@@ -46,4 +46,20 @@ export async function getTeamActivity(token) {
   return request('/leaderboard/activity', { method: 'GET', token });
 }
 
-export const api = { signup, login, getTeamActivity };
+export async function submitFlag(flag, token) {
+  return request('/game/submit-flag', {
+    method: 'POST',
+    body: { flag },
+    token,
+  });
+}
+
+export async function submitAnswer(avenger, answer, token) {
+  return request('/game/submit-answer', {
+    method: 'POST',
+    body: { avenger, answer },
+    token,
+  });
+}
+
+export const api = { signup, login, getTeamActivity, submitFlag, submitAnswer };
