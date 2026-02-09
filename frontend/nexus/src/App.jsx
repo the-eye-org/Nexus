@@ -4,6 +4,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Hulk from './pages/hulk/Hulk';
+import GammaWave from './pages/hulk/GammaWave';
+import HulkFinal from './pages/hulk/HulkFinal';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -24,6 +27,31 @@ const AppRoutes = () => {
         path="/dashboard"
         
       />
+       <Route
+        path="/hulk"
+        element={
+          <ProtectedRoute>
+            <Hulk />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/gamma_wave"
+        element={
+          <ProtectedRoute>
+            <GammaWave />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hulk_final"
+        element={
+          <ProtectedRoute>
+            <HulkFinal />
+          </ProtectedRoute>
+        }
+      />
+      
       <Route path="/" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
