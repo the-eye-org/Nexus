@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
         body {
-            
+
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -110,7 +110,7 @@
             text-align: center;
             border-radius: 8px;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-            max-width: 500px;
+            max-width: 700px;
             animation: fadeIn 0.5s ease-out;
             color: #fff;
         }
@@ -139,6 +139,7 @@
             padding: 0.8rem;
             border-radius: 4px;
             border: 1px dashed #cea135;
+            word-break: break-all;
         }
 
         .close-btn {
@@ -177,8 +178,8 @@
 <body>
     <!-- Hex Text on Top Plaque -->
     <div class="plaque-text">
-        48 20 4F 44 55 4E 47<br>
-        52 4F 20 45 44 54 4F
+        4F 44 47 20 46 4F 20<br>
+        0A 44 55 4E 54 48 45 52
     </div>
 
     <!-- Input Section on Bottom Plaque -->
@@ -192,7 +193,7 @@
             <h2 class="modal-title">WORTHY</h2>
             <p class="modal-text">
                 You are worthy of the storm.
-                <span class="secret-code">{ hnsfbdf }</span>
+                <span class="secret-code">neXus{wr7hy_0f_mj0ln1r}</span>
             </p>
             <button class="close-btn" onclick="closeModal()">Accept Destiny</button>
         </div>
@@ -223,6 +224,30 @@
             modal.style.display = 'none';
             input.value = ''; // Reset
         }
+
+        // Prevent Right Click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Prevent Inspect Element Shortcuts
+        document.onkeydown = function (e) {
+            // F12
+            if (e.keyCode == 123) {
+                return false;
+            }
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) {
+                return false;
+            }
+            // Ctrl+U
+            if (e.ctrlKey && e.keyCode == 85) {
+                return false;
+            }
+        };
+
+        // Aggressive Debugger Trap
+        setInterval(function () {
+            debugger;
+        }, 100);
     </script>
 </body>
 
