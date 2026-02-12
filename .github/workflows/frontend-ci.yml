@@ -23,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./frontend/nexus
+        working-directory: ./frontend/fr
 
     steps:
       - name: Checkout code
