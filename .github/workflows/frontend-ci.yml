@@ -52,17 +52,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        working-directory: .
-        run: |
-          VERSION=0.1-${GITHUB_SHA::7}
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$VERSION ./frontend
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Push Docker image to GHCR
-        run: |
-          docker push $IMAGE_NAME:latest
-          docker push $IMAGE_NAME:$VERSION
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:0.1-${{ github.sha }}
 
       - name: Notify Jenkins
         run: |
