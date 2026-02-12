@@ -45,7 +45,7 @@ pipeline {
                 sh """
                     docker run -d \
                         --name nexus-frontend \
-                        -p 8005:80 \
+                        -p 8005:3000 \
                         --restart unless-stopped \
                         ${GHCR_REPO}:${IMAGE_TAG}
                 """

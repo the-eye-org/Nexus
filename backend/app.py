@@ -20,15 +20,6 @@ def create_app():
     app.register_blueprint(game_bp, url_prefix="/nex-backend/api/game")
     app.register_blueprint(leaderboard_bp, url_prefix="/nex-backend/api/leaderboard")
     
-    # Root Endpoint
-    @app.route("/")
-    def root():
-        return jsonify({
-            "message": "NEXUS v2.0 - Team Authentication System",
-            "version": "2.0.0",
-            "status": "ONLINE"
-        })
-    
     @app.route("/nex-backend")
     def base_route():
         return jsonify({
