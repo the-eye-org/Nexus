@@ -1,0 +1,55 @@
+pipeline {
+    agent { label 'students' }
+
+    environment {
+        DOCKER_IMAGE = "ghcr.io/the-eye-org/nexus-frontend"
+        DOCKER_IMAGE_TAG = "latest"
+        REPOSITORY_URL = "https://github.com/the-eye-org/Nexus.git"
+        BRANCH = "main"
+        CREDENTIALS = "psgdcgit"
+        DOCKER_CONTAINER = "nginx-app"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: "${BRANCH}", credentialsId: "${CREDENTIALS}", url: "${REPOSITORY_URL}"
+            }
+        }
+
+stage('Build Docker Image') {
+    steps {
+        script {
+            sh '''
+                docker build . -t ${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}
+            '''
+        }
+    }
+}
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    sh """
+                    if [ \$(docker ps -a -q -f name=${DOCKER_CONTAINER}) ]; then
+                        docker stop ${DOCKER_CONTAINER} || true
+                        docker rm -f ${DOCKER_CONTAINER} || true
+                    fi
+                    
+                    docker run -d --name ${DOCKER_CONTAINER} -p 8004:80 ${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}
+                    """
+
+                }
+            }
+        }
+    }
+    
+
+    post {
+        success {
+            echo "Docker container deployed successfully!"
+        }
+        failure {
+            echo "Build or deployment failed."
+        }
+    }
+}
