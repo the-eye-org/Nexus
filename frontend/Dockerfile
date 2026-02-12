@@ -2,23 +2,18 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci
-
-# Copy source files
+# Copy source code
 COPY . .
 
-# Build the application
+# Define build arguments for environment variables
+
+# Set environment variables from build args
 RUN npm run build
 
-# Install a simple HTTP server to serve the built files
-RUN npm install -g serve
+EXPOSE 5173
 
-# Expose port 3000
-EXPOSE 3000
-
-# Serve the built app
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
