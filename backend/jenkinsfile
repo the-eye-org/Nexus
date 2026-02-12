@@ -1,56 +1,68 @@
 pipeline {
-    agent { label 'students' }
+    agent {
+        label 'students'
+    }
 
     environment {
-        DOCKER_IMAGE = "ghcr.io/the-eye-org/nexus-backend"
-        DOCKER_IMAGE_TAG = "latest"
-        REPOSITORY_URL = "https://github.com/the-eye-org/Nexus.git"
-        BRANCH = "main"
-        CREDENTIALS = "psgdcgit"
-        DOCKER_CONTAINER = "nexus-backend"
+        REGISTRY = "ghcr.io"
+        GHCR_REPO = 'ghcr.io/the-eye-org/nexus-backend'
+        IMAGE_TAG = 'latest'
+        DOCKER_CREDS = credentials('psgdcgit')
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Login to GHCR') {
             steps {
-                git branch: "${BRANCH}", credentialsId: "${CREDENTIALS}", url: "${REPOSITORY_URL}"
+                sh '''
+                    echo "$DOCKER_CREDS_PSW" | docker login $REGISTRY -u $DOCKER_CREDS_USR --password-stdin
+                '''
             }
         }
 
-stage('Build Docker Image') {
-    steps {
-        script {
-            sh '''
-                cd backend
-                docker build . -t ${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}
-            '''
+        stage('Pull Docker Image') {
+            steps {
+                sh "docker pull ${GHCR_REPO}:${IMAGE_TAG}"
+            }
         }
-    }
-}
-        stage('Run Docker Container') {
+
+        stage('Stop Existing Container') {
             steps {
                 script {
-                    sh """
-                    if [ \$(docker ps -a -q -f name=${DOCKER_CONTAINER}) ]; then
-                        docker stop ${DOCKER_CONTAINER} || true
-                        docker rm -f ${DOCKER_CONTAINER} || true
-                    fi
-                    500
-                    docker run -d --name ${DOCKER_CONTAINER} -p 8006:5000 ${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}
-                    """
-
+                    // Safely stop and remove existing container if it exists
+                    sh '''
+                        if [ "$(docker ps -q --filter name=nexus-backend)" ]; then
+                            docker stop nexus-backend
+                            docker rm nexus-backend
+                        fi
+                    '''
                 }
             }
         }
+
+        stage('Run Container') {
+            steps {
+                // Run the container with the backend API
+                sh """
+                    docker run -d \
+                        --name nexus-backend \
+                        -p 8006:5000 \
+                        --restart unless-stopped \
+                        ${GHCR_REPO}:${IMAGE_TAG}
+                """
+            }
+        }
     }
-    
 
     post {
+        always {
+            // Always logout from GHCR after the pipeline
+            sh 'docker logout ghcr.io'
+        }
         success {
-            echo "Docker container deployed successfully!"
+            echo 'Successfully deployed the backend API!'
         }
         failure {
-            echo "Build or deployment failed."
+            echo 'Pipeline failed! Please check the logs for details.'
         }
     }
 }

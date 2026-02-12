@@ -23,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./frontend/fr
+        working-directory: ./frontend
 
     steps:
       - name: Checkout code
@@ -55,7 +55,7 @@ jobs:
         working-directory: .
         run: |
           VERSION=0.1-${GITHUB_SHA::7}
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$VERSION ./frontend/fr
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$VERSION ./frontend
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Push Docker image to GHCR

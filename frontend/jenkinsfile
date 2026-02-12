@@ -1,0 +1,68 @@
+pipeline {
+    agent {
+        label 'students'
+    }
+
+    environment {
+        REGISTRY = "ghcr.io"
+        GHCR_REPO = 'ghcr.io/the-eye-org/nexus-frontend'
+        IMAGE_TAG = 'latest'
+        DOCKER_CREDS = credentials('psgdcgit')
+    }
+
+    stages {
+        stage('Login to GHCR') {
+            steps {
+                sh '''
+                    echo "$DOCKER_CREDS_PSW" | docker login $REGISTRY -u $DOCKER_CREDS_USR --password-stdin
+                '''
+            }
+        }
+
+        stage('Pull Docker Image') {
+            steps {
+                sh "docker pull ${GHCR_REPO}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Stop Existing Container') {
+            steps {
+                script {
+                    // Safely stop and remove existing container if it exists
+                    sh '''
+                        if [ "$(docker ps -q --filter name=nexus-frontend)" ]; then
+                            docker stop nexus-frontend
+                            docker rm nexus-frontend
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                // Run the container with the frontend application
+                sh """
+                    docker run -d \
+                        --name nexus-frontend \
+                        -p 8005:80 \
+                        --restart unless-stopped \
+                        ${GHCR_REPO}:${IMAGE_TAG}
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            // Always logout from GHCR after the pipeline
+            sh 'docker logout ghcr.io'
+        }
+        success {
+            echo 'Successfully deployed the frontend application!'
+        }
+        failure {
+            echo 'Pipeline failed! Please check the logs for details.'
+        }
+    }
+}

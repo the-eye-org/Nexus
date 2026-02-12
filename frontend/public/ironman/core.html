@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Arc Reactor Core</title>
+    <style>
+        body {
+            background:black;
+            text-align:center;
+            padding-top:40px;
+            font-family: monospace;
+            color:#00efff;
+        }
+        canvas {
+            border:2px solid #00eaff;
+            margin-top:20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            background-color: #0a1a1a;
+            margin: 10% auto;
+            padding: 30px;
+            border: 2px solid #00eaff;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0,234,255,0.5);
+        }
+        .modal h2 {
+            color: #00eaff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00eaff;
+        }
+        .modal p {
+            color: #00eaff;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .modal input {
+            padding: 10px;
+            font-size: 1em;
+            border: 2px solid #00eaff;
+            background: #001a1a;
+            color: #00eaff;
+            border-radius: 5px;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .modal input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00eaff;
+        }
+        .modal button {
+            padding: 10px 30px;
+            margin: 10px;
+            border: 2px solid #00eaff;
+            background: rgba(0,234,255,0.1);
+            color: #00eaff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .modal button:hover {
+            background: rgba(0,234,255,0.3);
+            box-shadow: 0 0 10px #00eaff;
+        }
+        .modal .error {
+            color: #ff3333;
+            margin-top: 10px;
+            display: none;
+        }
+        .success-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .success-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            max-width: 600px;
+        }
+        .success-content img {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,234,255,0.8);
+        }
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .keypad-btn {
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: rgba(0, 234, 255, 0.08);
+            border: 2px solid #00eaff;
+            color: #00eaff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 0 8px #00eaff inset;
+        }
+
+        .keypad-btn:hover {
+            background: rgba(0, 234, 255, 0.22);
+            box-shadow: 0 0 15px #00eaff, 0 0 25px #00eaff inset;
+            transform: translateY(-2px);
+        }
+
+        .special-btn {
+            letter-spacing: 2px;
+        }
+
+        .special-btn.red {
+            border-color: #ff4444;
+            color: #ff4444;
+            box-shadow: 0 0 10px #ff4444 inset;
+        }
+
+        .special-btn.red:hover {
+            background: rgba(255, 68, 68, 0.2);
+            box-shadow: 0 0 18px #ff4444, 0 0 25px #ff4444 inset;
+        }
+
+        .special-btn.green {
+            border-color: #00ff99;
+            color: #00ff99;
+            box-shadow: 0 0 10px #00ff99 inset;
+        }
+
+        .special-btn.green:hover {
+            background: rgba(0, 255, 153, 0.2);
+            box-shadow: 0 0 18px #00ff99, 0 0 25px #00ff99 inset;
+        }
+        .modal {
+            overflow-y: auto;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        .modal-content {
+            margin-top: 4% !important;
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>Arc Reactor Core</h1>
+<p>Click the correct energy beam to stabilize the core.</p>
+
+<canvas id="reactor" width="400" height="400"></canvas>
+
+<!-- Tony Stark Verification Modal -->
+<div id="tonyVerifyModal" class="modal">
+    <div class="modal-content" style="background:rgba(0,10,20,0.85); backdrop-filter: blur(6px);">
+
+        <h2 style="margin-bottom:15px; text-shadow: 0 0 12px #00eaff;">STARK AUTHENTICATION</h2>
+        <p>Love you <span style="color:#ffaa00;">___</span></p>
+
+        <!-- Keypad Container -->
+        <div id="keypadBox"
+            style="
+                width: 420px;                  /* increased width */
+                margin: 35px auto;
+                padding: 40px 35px;            /* more horizontal padding */
+                border-radius: 22px;
+                background: rgba(0, 25, 35, 0.60);
+                border: 2px solid #00eaff;
+                box-shadow:
+                    0 0 25px #00eaff inset,
+                    0 0 35px rgba(0,234,255,0.6),
+                    0 0 50px rgba(0,234,255,0.25);
+                backdrop-filter: blur(10px);
+            "
+        >
+
+
+
+            <!-- Display -->
+            <div id="displayBox"
+                style="
+                    width:100%;
+                    height:55px;
+                    background:rgba(0,0,0,0.6);
+                    border:2px solid #00eaff;
+                    border-radius:10px;
+                    margin-bottom:20px;
+                    font-size:2em;
+                    letter-spacing:8px;
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    box-shadow:0 0 12px #00eaff inset;
+                "
+            ></div>
+
+            <!-- NUMPAD -->
+            <div class="keypad-grid">
+                <button class="keypad-btn">1</button>
+                <button class="keypad-btn">2</button>
+                <button class="keypad-btn">3</button>
+                <button class="keypad-btn">4</button>
+                <button class="keypad-btn">5</button>
+                <button class="keypad-btn">6</button>
+                <button class="keypad-btn">7</button>
+                <button class="keypad-btn">8</button>
+                <button class="keypad-btn">9</button>
+                <button class="keypad-btn">0</button>
+                <button id="clearBtn" class="keypad-btn special-btn red">CLR</button>
+                <button id="enterBtn" class="keypad-btn special-btn green">ENTER</button>
+            </div>
+        </div>
+
+        <div class="error" id="errorMsg">Incorrect. Try again.</div>
+    </div>
+</div>
+
+<!-- Success Modal with Image -->
+<div id="successModal" class="success-modal">
+    <div class="success-content">
+        <img src="ironmancookie.jpg" alt="Tony Stark Cookie" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23000%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%2300eaff%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3ETony Stark eating a cookie%3C/text%3E%3C/svg%3E'">
+
+    </div>
+</div>
+
+<script>
+
+if (sessionStorage.getItem("ironman_unlock") !== "1") {
+    document.body.innerHTML = "<h1 style='color:red'>ACCESS DENIED</h1>";
+}
+
+
+function getCookie(name) {
+    let nameEQ = name + "=";
+    let cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.indexOf(nameEQ) === 0) {
+            return cookie.substring(nameEQ.length);
+        }
+    }
+    return null;
+}
+
+if (getCookie("arc_reactor") === null) {
+    document.cookie = "arc_reactor=unstable; path=/";
+}
+
+if (getCookie("arc_reactor") === "stable") {
+    let eF = "Ym1WWWRYTjdkREJ1ZVY5emREUnlhMTh4YzE5cGNqQnViVFJ1ZlE9PQ==";
+    let dF = atob(atob(eF));
+
+    let fDiv = document.createElement("div");
+    fDiv.style.cssText =
+        "margin-top:30px; padding:20px; border:2px solid #00ff00; background:#001a00; color:#00ff00; font-weight:bold; font-size:1.2em; border-radius:5px;";
+
+    const k = String.fromCharCode;
+    const w = k(70)+k(76)+k(65)+k(71);
+
+    fDiv.innerHTML = "🚩 " + w + ": <code>" + dF + "</code>";
+    document.body.appendChild(fDiv);
+}
+
+
+// Draw Arc Reactor
+let c = document.getElementById("reactor");
+let ctx = c.getContext("2d");
+
+// Reactor drawing
+function drawReactor() {
+    ctx.fillStyle = "#001016";
+    ctx.fillRect(0,0,400,400);
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.strokeStyle = "#00eaff";
+    ctx.lineWidth = 8;
+    ctx.arc(200,200,150,0,2*Math.PI);
+    ctx.stroke();
+
+    // Beams (fake)
+    for (let i=0; i<8; i++){
+        let angle = i * (Math.PI/4);
+        ctx.beginPath();
+        ctx.strokeStyle = "#005f75";
+        ctx.lineWidth = 5;
+        ctx.moveTo(200,200);
+        ctx.lineTo(200+Math.cos(angle)*120, 200+Math.sin(angle)*120);
+        ctx.stroke();
+    }
+
+}
+drawReactor();
+
+c.onclick = function(e) {
+    let rect = c.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    if (x >= 190 && x <= 210 && y >= 80 && y <= 120) {
+        showVerificationModal();
+    } else {
+        alert("Incorrect beam detected!");
+    }
+};
+
+// Show verification modal
+function showVerificationModal() {
+    let modal = document.getElementById("tonyVerifyModal");
+    modal.style.display = "block";
+    document.getElementById("answerInput").focus();
+    document.getElementById("errorMsg").style.display = "none";
+}
+
+let codeInput = "";
+
+// Attach numpad click events
+document.querySelectorAll(".keypad-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        let val = btn.innerText;
+
+        if (val >= "0" && val <= "9") {
+            if (codeInput.length < 4) {
+                codeInput += val;
+                document.getElementById("displayBox").innerText = codeInput;
+            }
+        }
+    });
+});
+
+// CLEAR
+document.getElementById("clearBtn").onclick = function() {
+    codeInput = "";
+    document.getElementById("displayBox").innerText = "";
+};
+
+// ENTER
+document.getElementById("enterBtn").onclick = function() {
+    let _correct = "3000";
+
+    if (codeInput === _correct) {
+        document.getElementById("tonyVerifyModal").style.display = "none";
+        let successModal = document.getElementById("successModal");
+        successModal.style.display = "block";
+
+        successModal.onclick = function() {
+            successModal.style.display = "none";
+        };
+    } else {
+        document.getElementById("errorMsg").style.display = "block";
+        codeInput = "";
+        document.getElementById("displayBox").innerText = "";
+    }
+};
+
+
+// Cancel verification
+function cancelVerification() {
+    let modal = document.getElementById("tonyVerifyModal");
+    modal.style.display = "none";
+    document.getElementById("answerInput").value = "";
+    document.getElementById("errorMsg").style.display = "none";
+}
+
+// Allow Enter key to verify
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && document.getElementById("tonyVerifyModal").style.display === "block") {
+        verifyAnswer();
+    }
+});
+</script>
+
+</body>
+</html>
