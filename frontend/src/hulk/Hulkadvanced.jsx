@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HulkAdvanced.css';
+import './Hulkadvanced.css';
 import gammaStegoImg from '../assets/img/gamma_stego.png';
 import { useAuth } from '../context/AuthContext';
 import { validateHulkCtfStage } from '../api/client';
