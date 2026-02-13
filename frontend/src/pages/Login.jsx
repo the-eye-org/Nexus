@@ -52,24 +52,24 @@ const Login = () => {
       {/* Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-marvel-red/10 via-marvel-black to-marvel-black opacity-50" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-marvel-red/20 blur-[120px] rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vh] bg-marvel-red/20 blur-[120px] rounded-full" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="glass-panel rounded-2xl p-8 shadow-[0_0_40px_rgba(237,29,36,0.1)] border border-white/10 backdrop-blur-xl">
+        <div className="glass-panel rounded-2xl p-6 sm:p-8 shadow-[0_0_40px_rgba(237,29,36,0.1)] border border-white/10 backdrop-blur-xl">
           <div className="text-center mb-8">
-            <p className="font-general text-xs uppercase tracking-[0.2em] text-marvel-red mb-2">
+            <p className="font-general-sans text-xs uppercase tracking-[0.2em] text-marvel-red mb-2">
               S.H.I.E.L.D. RESTRICTED ACCESS
             </p>
-            <h1 className="special-font font-zentry text-4xl font-black uppercase text-white leading-none text-glow">
-              <b>Nexus</b> Portal
+            <h1 className="special-font uppercase text-white leading-none text-5xl sm:text-6xl">
+              <b>Nexus</b> <b>Portal</b>
             </h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="block font-general text-xs uppercase text-white/60 mb-2 tracking-wide">
-                Agent ID
+              <label htmlFor="username" className="special-font text-2xl uppercase text-white/60 mb-3 tracking-wider">
+                <b>Agent ID</b>
               </label>
               <input
                 id="username"
@@ -82,8 +82,8 @@ const Login = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block font-general text-xs uppercase text-white/60 mb-2 tracking-wide">
-                Passcode
+              <label htmlFor="password" className="special-font text-2xl uppercase text-white/60 mb-3 tracking-wider">
+                <b>Passcode</b>
               </label>
               <input
                 id="password"
@@ -97,7 +97,7 @@ const Login = () => {
             </div>
             {isSignup && (
               <div>
-                <label htmlFor="confirm" className="block font-general text-xs uppercase text-white/60 mb-2 tracking-wide">Confirm Passcode</label>
+                <label htmlFor="confirm" className="special-font text-2xl uppercase text-white/60 mb-2 tracking-wider"><b>Confirm Passcode</b></label>
                 <input
                   id="confirm"
                   type="password"
@@ -110,31 +110,31 @@ const Login = () => {
               </div>
             )}
             {error && (
-              <div className="p-3 rounded bg-marvel-red/10 border border-marvel-red/20">
-                <p className="font-general text-xs text-marvel-red text-center tracking-wide">{error}</p>
+              <div className="p-3 rounded-lg bg-marvel-red/10 border border-marvel-red/20">
+                <p className="font-general-sans text-xs text-marvel-red text-center tracking-wide">{error}</p>
               </div>
             )}
             <button
               type="submit"
-              className="w-full group relative overflow-hidden rounded-lg bg-marvel-red px-7 py-3.5 font-general text-xs uppercase font-bold text-white transition-all hover:bg-marvel-red-dark hover:shadow-[0_0_20px_rgba(237,29,36,0.4)]"
+              className="w-full group relative overflow-hidden rounded-lg bg-marvel-red px-7 py-3.5 font-general-sans text-sm uppercase font-bold text-white transition-all hover:bg-marvel-red-dark hover:shadow-[0_0_20px_rgba(237,29,36,0.4)]"
             >
               <span className="relative z-10">{isSignup ? 'Create Agent' : 'Authenticate'}</span>
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-white/20 transition-transform duration-300 skew-x-12" />
             </button>
           </form>
 
-          <div className="mt-6 flex items-center justify-between gap-4">
-            <p className="text-center font-circular-web text-xs text-white/40 flex-1">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+            <p className="text-start w-full font-circular-web text-sm text-white/40 flex-1">
               <button
                 onClick={() => { setIsSignup((s) => !s); setError(''); }}
-                className="underline hover:text-white transition-colors"
+                className="underline hover:text-white transition-colors text-left"
                 type="button"
               >
                 {isSignup ? 'Have an account? Sign in' : "Don't have an account? Create one"}
               </button>
             </p>
             <p className="text-right">
-              <Link to="/" className="hover:text-white transition-colors flex items-center justify-center gap-1 group text-xs text-white/40">
+              <Link to="/" className="hover:text-white transition-colors flex items-center justify-center gap-1 group text-sm text-white/40">
                 <span className="group-hover:-translate-x-1 transition-transform">←</span> Return to Base
               </Link>
             </p>

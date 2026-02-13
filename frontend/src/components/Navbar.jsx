@@ -11,8 +11,8 @@ const allNavItems = [
   { label: 'Home', to: '/' },
   { label: 'Challenges', to: '/challenges', authOnly: true },
   { label: 'Leaderboard', to: '/leaderboard', authOnly: true },
-  { label: 'About us', to: '/#about' },
-  { label: 'Contact', to: '/#contact' },
+  // { label: 'About us', to: '/#about' },
+  // { label: 'Contact', to: '/#contact' },
   { label: 'Login', to: '/login', guestOnly: true },
 ];
 
@@ -216,8 +216,8 @@ const Navbar = () => {
               to={item.to}
               onClick={closeMobileMenu}
               className={`py-3 px-2 font-general text-sm uppercase tracking-wider rounded-lg transition-colors ${isActive(item)
-                  ? 'text-marvel-red bg-white/10'
-                  : 'text-white hover:bg-white/5'
+                ? 'text-marvel-red bg-white/10'
+                : 'text-white hover:bg-white/5'
                 }`}
             >
               {item.label}
