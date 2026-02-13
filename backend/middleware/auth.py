@@ -3,6 +3,7 @@ from flask import request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt, get_jwt_identity
 from models import teams_collection
 from datetime import datetime, timedelta
+from config import Config
 
 
 def strong_auth_required(f):
@@ -37,8 +38,13 @@ def strong_auth_required(f):
             original_ua = claims.get("ua")
             current_ua = request.headers.get("User-Agent", "")
             if original_ua and original_ua != current_ua:
-                # Token being used on different browser/device -> ALARM
-                return jsonify({"error": "Security Violation: Session Bound to Original Device"}), 403
+                # Token being used on different browser/device
+                # In strict mode, block; otherwise, allow but note mismatch
+                if Config.STRICT_UA_BINDING:
+                    return jsonify({"error": "Security Violation: Session Bound to Original Device"}), 403
+                else:
+                    # Soft warning: attach a hint in request context
+                    request.ua_mismatch = True
 
             # 5. Verify Team Still Exists (Security)
             team = teams_collection.find_one({"team_name": team_name})

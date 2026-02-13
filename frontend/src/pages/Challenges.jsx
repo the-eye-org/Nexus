@@ -123,7 +123,10 @@ const Challenges = () => {
       alert('Please enter a flag.');
       return;
     }
-    const res = await api.submitFlag(flagInput.trim(), token);
+    const isHulk = selectedChallenge?.id === 'hulk';
+    const res = isHulk
+      ? await api.submitAdvancedFlag(flagInput.trim(), token)
+      : await api.submitFlag(flagInput.trim(), token);
     if (!res.ok) {
       alert(res.error || 'Submission failed');
       return;

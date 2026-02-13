@@ -12,6 +12,8 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "nexus-jwt-secret-key-change-in-production")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=3)  # STRICT 3-hour session
     JWT_TOKEN_LOCATION = ["headers"]
+    # Toggle User-Agent binding enforcement (strict blocks on mismatch)
+    STRICT_UA_BINDING = os.getenv("STRICT_UA_BINDING", "false").lower() == "true"
     
     # MongoDB
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
@@ -41,3 +43,9 @@ class Config:
     # Rate Limiting
     RATELIMIT_DEFAULT = "100 per hour"
     RATELIMIT_STORAGE_URI = "memory://"
+
+    # OSINT codes required per Avenger to unlock question after flag
+    OSINT_CODES = {
+        "hulk": ["BANNER247", "GW-247"],
+        # Extend for other avengers if desired
+    }

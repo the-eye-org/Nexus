@@ -30,6 +30,9 @@ const Footer = () => {
                     hover:text-marvel-red hover:underline md:text-right transition-colors font-circular-web'>
           Privacy Policy
         </a>
+        <a href={import.meta.env?.BASE_URL ? `${import.meta.env.BASE_URL}robots.txt` : '/robots.txt'} className='text-center text-sm text-white/40 hover:text-marvel-red hover:underline md:text-right transition-colors font-circular-web' title="Site compliance">
+          Compliance
+        </a>
       </div>
     </footer>
   )

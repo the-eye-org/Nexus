@@ -61,7 +61,7 @@ const Hulk = () => {
     // Hide button after 2 seconds
     const timer = setTimeout(() => {
       setShowButton(false);
-    }, 2000);
+    }, 1400);
     
     setButtonTimer(timer);
   };
@@ -168,7 +168,7 @@ const Hulk = () => {
             /* SYSTEM LOG: Gauge synchronization detected at 0x47414D4D41 */
           </p>
           <p className="subtle-hint">
-            Dr. Banner's notes: "The third reading holds the key..."
+            Dr. Banner's notes: "3/4 of 100 is the sweet spot... but timing is everything."
           </p>
         </div>
         {attempts > 3 && (
@@ -176,6 +176,7 @@ const Hulk = () => {
             💡 Try hovering over Gauge 3 when its value is between 65-75%
           </div>
         )}
+        {/* Advanced CTF path is gated and accessible from GammaWave after OSINT submission */}
       </div>
 
       {/* Footer */}
