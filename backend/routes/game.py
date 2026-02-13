@@ -5,6 +5,7 @@ from config import Config
 from extensions import limiter
 from datetime import datetime
 import hashlib
+import re
 
 game_bp = Blueprint("game", __name__)
 
@@ -163,6 +164,67 @@ def submit_answer():
     resp.headers["X-Gamma-Signature"] = "TNZZN_FZNFU"  # ROT13 of GAMMA_SMASH
     return resp, 200
 
+
+@game_bp.route("/hulk-osint", methods=["POST"])
+@strong_auth_required
+@limiter.limit("30 per minute")
+def hulk_osint():
+    """Validate Hulk forensics/OSINT token server-side without submitting any flag."""
+    team = request.team
+    data = request.get_json() or {}
+    osint_code = (data.get("osint_code", "") or "").strip().upper()
+
+    required_codes = Config.OSINT_CODES.get("hulk", [])
+    if not osint_code or osint_code not in required_codes:
+        log_activity(team["team_name"], "OSINT_FAIL", {"avenger": "hulk"})
+        return jsonify({"success": False, "message": "Invalid forensics token."}), 400
+
+    log_activity(team["team_name"], "OSINT_OK", {"avenger": "hulk"})
+    return jsonify({"success": True, "message": "Forensics token accepted."}), 200
+
+
+@game_bp.route("/hulk-logic-stage", methods=["POST"])
+@strong_auth_required
+@limiter.limit("30 per minute")
+def hulk_logic_stage():
+    """Validate Hulk GammaWave logic stages server-side.
+
+    Stages:
+    1 -> HULK (binary decoding)
+    2 -> GAMMA_SMASH (ROT13 of TNZZN_FZNFU)
+    3 -> EMERALD_SMASH (substitution cipher)
+    4 -> JADE_CRUSH (hex to ASCII)
+    """
+    team = request.team
+    data = request.get_json() or {}
+    stage = int(data.get("stage", 0))
+    answer = (data.get("answer", "") or "").strip().upper()
+
+    if stage == 1:
+        ok = answer == "HULK"
+        error_message = "Incorrect. Try again."
+    elif stage == 2:
+        normalized = re.sub(r"[_\-\s]", "", answer)
+        ok = normalized == "GAMMASMASH"
+        error_message = "Incorrect. Try again."
+    elif stage == 3:
+        normalized = re.sub(r"[_\-\s]", "", answer)
+        ok = normalized == "EMERALDSMASH"
+        error_message = "Incorrect. Try again."
+    elif stage == 4:
+        normalized = re.sub(r"[_\-\s]", "", answer)
+        ok = normalized == "JADECRUSH"
+        error_message = "Incorrect. Try again."
+    else:
+        return jsonify({"error": "Invalid stage"}), 400
+
+    if not ok:
+        log_activity(team["team_name"], "HULK_LOGIC_FAIL", {"stage": stage})
+        return jsonify({"success": False, "message": error_message}), 400
+
+    log_activity(team["team_name"], "HULK_LOGIC_STAGE_OK", {"stage": stage})
+    return jsonify({"success": True}), 200
+
 @game_bp.route("/submit-advanced-flag", methods=["POST"])
 @strong_auth_required
 @limiter.limit("10 per minute")
@@ -181,16 +243,12 @@ def submit_advanced_flag():
         return jsonify({"error": "Final flag required"}), 400
 
     # Validate Hulk Advanced flag (hash compare for consistency)
-    advanced_flag_plain = "FLAG{HULK_GAMMA_MASTER_2026}"
+    advanced_flag_plain = "neXus{H0LK_G1MM1_ENTRY}"
     advanced_hash = hashlib.sha256(advanced_flag_plain.encode("utf-8")).hexdigest()
     submitted_hash = hashlib.sha256(final_flag.encode("utf-8")).hexdigest()
     if submitted_hash != advanced_hash:
         log_activity(team['team_name'], "ADV_FLAG_FAIL", {"avenger": "hulk"})
         return jsonify({"success": False, "message": "Incorrect Final Flag"}), 400
-
-    # Require prior Hulk flag submission
-    if "hulk" not in team.get('solved_flags', []):
-        return jsonify({"error": "Submit Hulk flag first"}), 403
 
     stone = Config.STONE_MAPPING["hulk"]
     # Check if already collected
@@ -202,6 +260,7 @@ def submit_advanced_flag():
         {"team_name": team['team_name']},
         {
             "$addToSet": {
+                "solved_flags": "hulk",
                 "collected_stones": stone,
                 "completed_avengers": "hulk"
             },
@@ -218,3 +277,72 @@ def submit_advanced_flag():
         "points_awarded": Config.POINTS_FLAG + Config.POINTS_ANSWER
     })
     return resp, 200
+
+
+@game_bp.route("/hulk-ctf-stage", methods=["POST"])
+@strong_auth_required
+@limiter.limit("30 per minute")
+def hulk_ctf_stage():
+    """Validate Hulk Advanced CTF stages server-side.
+
+    Stage 1: steganography -> gamma_encrypted_xk7m
+    Stage 2: decrypt text -> endpoint containing gamma-analyze
+    Stage 3: specific JWT token
+    Stage 4: SQL injection payload -> return final flag
+    """
+    team = request.team
+    data = request.get_json() or {}
+    stage = int(data.get("stage", 0))
+    value = (data.get("value", "") or "").strip()
+
+    if stage == 1:
+        # Expect exact hidden text from stego analysis
+        if value.lower() != "gamma_encrypted_xk7m":
+            log_activity(team["team_name"], "HULK_CTF_FAIL", {"stage": stage})
+            return jsonify({"success": False, "message": "Incorrect steganography extraction."}), 400
+        log_activity(team["team_name"], "HULK_CTF_STAGE_OK", {"stage": stage})
+        return jsonify({"success": True}), 200
+
+    if stage == 2:
+        lower = value.lower()
+        if "gamma-analyze" not in lower and "gamma/analyze" not in lower:
+            log_activity(team["team_name"], "HULK_CTF_FAIL", {"stage": stage})
+            return jsonify({"success": False, "message": "Wrong endpoint."}), 400
+        log_activity(team["team_name"], "HULK_CTF_STAGE_OK", {"stage": stage})
+        return jsonify({"success": True}), 200
+
+    if stage == 3:
+        jwt_pattern = re.compile(r"^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$")
+        if not jwt_pattern.match(value):
+            return jsonify({"success": False, "message": "Invalid JWT format."}), 400
+
+        expected_jwt = (
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+            "eyJ1c2VyIjoiYmFubmVyIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzcxMDA3MzAyfQ."
+            "ReA_DfP9Uco5PXDgHWWY6FVHkgvZAmuS3zeWZFwLCqI"
+        )
+
+        if value != expected_jwt:
+            log_activity(team["team_name"], "HULK_CTF_FAIL", {"stage": stage})
+            return jsonify({"success": False, "message": "Incorrect JWT token."}), 400
+
+        log_activity(team["team_name"], "HULK_CTF_STAGE_OK", {"stage": stage})
+        return jsonify({"success": True}), 200
+
+    if stage == 4:
+        lower = value.lower()
+        is_sql_injection = (
+            "' or '1'='1" in lower
+            or "1=1" in lower
+            or " union " in f" {lower} "
+        )
+
+        if not is_sql_injection:
+            log_activity(team["team_name"], "HULK_CTF_FAIL", {"stage": stage})
+            return jsonify({"success": False, "message": "Query failed."}), 400
+
+        final_flag = "neXus{H0LK_G1MM1_ENTRY}"
+        log_activity(team["team_name"], "HULK_CTF_STAGE_OK", {"stage": stage})
+        return jsonify({"success": True, "flag": final_flag}), 200
+
+    return jsonify({"error": "Invalid stage"}), 400

@@ -357,7 +357,7 @@ STONE_MAPPING = {
 |---------|------|-------|----------|--------|
 | Iron Man | `FLAG{ARC_REACTOR_CORE}` | Power | What element did Tony Stark synthesize? | vibranium |
 | Thor | `FLAG{BIFROST_GUARDIAN}` | Space | What is Thor's hammer called? | mjolnir |
-| Hulk | `FLAG{GAMMA_RADIATION}` | Mind | Who created Ultron? | tony stark |
+| Hulk | `FLAG{HULK_GAMMA_ENTRY}` | Mind | Who created Ultron? | tony stark |
 | Captain America | `FLAG{SUPER_SOLDIER}` | Time | What is Cap's shield made of? | vibranium |
 | Black Widow | `FLAG{RED_ROOM_PROTOCOL}` | Soul | What is Black Widow's real name? | natasha romanoff |
 | Hawkeye | `FLAG{NEVER_MISS}` | Reality | What happened to Hawkeye's family? | snapped |

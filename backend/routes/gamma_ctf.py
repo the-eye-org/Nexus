@@ -29,7 +29,7 @@ def gamma_analyze():
             "success": True,
             "data": [{
                 "id": 1,
-                "flag": "FLAG{HULK_GAMMA_MASTER_2026}",
+                "flag": "neXus{H0LK_G1MM1_ENTRY}",
                 "created_at": "2026-01-01"
             }]
         }), 200

@@ -46,7 +46,7 @@ def seed_game_flags():
             "answer": "mjolnir"
         },
         "hulk": {
-            "flag": "FLAG{GAMMA_RADIATION}", 
+            "flag": "neXus{H0LK_G1MM1_ENTRY}", 
             "stone": "mind",
             "question": "Who created Ultron?",
             "answer": "tony stark"
@@ -110,7 +110,7 @@ def seed_ctf_data():
     
     # Insert CTF flag
     db.execute("""
-        INSERT INTO secrets (flag) VALUES ('FLAG{HULK_GAMMA_MASTER_2026}')
+        INSERT INTO secrets (flag) VALUES ('neXus{H0LK_G1MM1_ENTRY}')
     """)
     
     print("✅ CTF data seeded")

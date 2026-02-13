@@ -34,7 +34,7 @@ def main():
     print("\n🎯 Default Flags (FOR TESTING ONLY - CHANGE IN PRODUCTION):")
     print("   - Iron Man: FLAG{ARC_REACTOR_CORE}")
     print("   - Thor: FLAG{BIFROST_GUARDIAN}")
-    print("   - Hulk: FLAG{GAMMA_RADIATION}")
+    print("   - Hulk: FLAG{H0LK_G1MM1_ENTRY}")
     print("   - Captain America: FLAG{SUPER_SOLDIER}")
     print("   - Black Widow: FLAG{RED_ROOM_PROTOCOL}")
     print("   - Hawkeye: FLAG{NEVER_MISS}")
