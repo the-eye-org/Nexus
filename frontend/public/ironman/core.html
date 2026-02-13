@@ -624,7 +624,7 @@
             let _correct = "3000";
 
             if (codeInput === _correct) {
-                document.cookie = "arc_reactor=stable; path=/";
+                document.cookie = "arc_reactor=unstable; path=/";
                 document.getElementById("tonyVerifyModal").style.display = "none";
 
                 let successModal = document.getElementById("successModal");
@@ -632,7 +632,7 @@
 
                 successModal.onclick = function () {
                     successModal.style.display = "none";
-                    window.location.reload(); // Reload to show the flag
+                    window.location.reload();
                 };
             } else {
                 document.getElementById("errorMsg").style.display = "block";
