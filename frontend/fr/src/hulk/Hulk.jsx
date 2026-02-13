@@ -168,7 +168,7 @@ const Hulk = () => {
             /* SYSTEM LOG: Gauge synchronization detected at 0x47414D4D41 */
           </p>
           <p className="subtle-hint">
-            Dr. Banner's notes: "The third reading holds the key..."
+            Dr. Banner's notes: "3/4 of 100 is the sweet spot... but timing is everything."
           </p>
         </div>
         {attempts > 3 && (

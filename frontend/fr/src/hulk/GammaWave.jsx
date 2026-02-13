@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { submitFlag as submitFlagApi, submitAnswer as submitAnswerApi } from '../api/client';
+import { validateHulkLogicStage, verifyHulkOsint } from '../api/client';
 import './GammaWave.css';
 
 const GammaWave = () => {
@@ -16,21 +16,15 @@ const GammaWave = () => {
 
   // Final submission state
   const [finalMode, setFinalMode] = useState(false);
-  const [flagValue, setFlagValue] = useState('');
   const [osintValue, setOsintValue] = useState('');
   const [flagSubmitting, setFlagSubmitting] = useState(false);
   const [flagResult, setFlagResult] = useState(null); // { success, message }
-  const [backendQuestion, setBackendQuestion] = useState('');
-  const [avengerKey, setAvengerKey] = useState('');
-  const [answerValue, setAnswerValue] = useState('');
-  const [answerSubmitting, setAnswerSubmitting] = useState(false);
-  const [answerResult, setAnswerResult] = useState(null); // { success, message }
+  const [backendQuestion] = useState('');
   const [osintOk, setOsintOk] = useState(() => {
     try { return sessionStorage.getItem('gamma_osint_ok') === '1'; } catch { return false; }
   });
 
-  // Final flag for Hulk (backed by backend seed)
-  const FINAL_FLAG_HULK = 'FLAG{GAMMA_RADIATION}';
+  // Hulk base flag is now only used at final submission in Challenges.
   const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:5000/api';
   const APP_BASE = import.meta.env?.BASE_URL || '/';
   const storedToken = (() => {
@@ -138,85 +132,43 @@ const GammaWave = () => {
     ╚═══════════════════════════════════════════════════════════╝
   `;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const trimmedInput = inputValue.trim().toUpperCase();
-    
-    // ====================================
-    // STAGE 1: Binary Decoding
-    // ====================================
-    if (stage === 1) {
-      if (trimmedInput === 'HULK') {
-        setStage(2);
-        setUnlockedClues(prev => [...prev, 'stage1']);
-        setShowError(false);
-        setInputValue('');
-        return;
-      } else {
+    const trimmedInput = inputValue.trim();
+
+    try {
+      const res = await validateHulkLogicStage(stage, trimmedInput, user?.token);
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout?.();
+          navigate('/login');
+          return;
+        }
         setShowError(true);
-        setErrorMessage('Incorrect. Try again.');
+        setErrorMessage(res.error || res.data?.message || 'Incorrect. Try again.');
         setAttempts(prev => prev + 1);
-      }
-    }
-    
-    // ====================================
-    // STAGE 2: ROT13 Decoding
-    // ====================================
-    else if (stage === 2) {
-      const normalized = trimmedInput.replace(/[_-\s]/g, '');
-      
-      if (normalized === 'GAMMASMASH') {
-        setStage(3);
-        setUnlockedClues(prev => [...prev, 'stage2']);
-        setShowError(false);
-        setInputValue('');
-        return;
       } else {
-        setShowError(true);
-        setErrorMessage('Incorrect. Try again.');
-        setAttempts(prev => prev + 1);
-      }
-    }
-    
-    // ====================================
-    // STAGE 3: Substitution Cipher
-    // ====================================
-    else if (stage === 3) {
-      const normalized = trimmedInput.replace(/[_-\s]/g, '');
-      
-      if (normalized === 'EMERALDSMASH') {
-        setStage(4);
-        setUnlockedClues(prev => [...prev, 'stage3']);
+        // Advance local stage state on success
+        if (stage === 1) {
+          setStage(2);
+          setUnlockedClues(prev => [...prev, 'stage1']);
+        } else if (stage === 2) {
+          setStage(3);
+          setUnlockedClues(prev => [...prev, 'stage2']);
+        } else if (stage === 3) {
+          setStage(4);
+          setUnlockedClues(prev => [...prev, 'stage3']);
+        } else if (stage === 4) {
+          setFinalMode(true);
+        }
         setShowError(false);
-        setInputValue('');
-        return;
-      } else {
-        setShowError(true);
-        setErrorMessage('Incorrect. Try again.');
-        setAttempts(prev => prev + 1);
       }
+    } catch (err) {
+      setShowError(true);
+      setErrorMessage('Validation failed. Try again.');
+      setAttempts(prev => prev + 1);
     }
-    
-    // ====================================
-    // STAGE 4: Hex to ASCII
-    // ====================================
-    else if (stage === 4) {
-      const normalized = trimmedInput.replace(/[_-\s]/g, '');
-      
-      if (normalized === 'JADECRUSH') {
-        // Success: enable final submission mode within this page and reveal final flag
-        setFinalMode(true);
-        setFlagValue(FINAL_FLAG_HULK);
-        setShowError(false);
-        setInputValue('');
-        return;
-      } else {
-        setShowError(true);
-        setErrorMessage('Incorrect. Try again.');
-        setAttempts(prev => prev + 1);
-      }
-    }
-    
+
     setInputValue('');
   };
 
@@ -253,23 +205,20 @@ const GammaWave = () => {
   const currentStage = getCurrentStageContent();
 
   // Backend integrations
-  const onSubmitFlag = async (e) => {
+  const onVerifyToken = async (e) => {
     e.preventDefault();
     if (!isLoggedIn || !user?.token) {
-      setFlagResult({ success: false, message: 'Please log in to submit.' });
+      setFlagResult({ success: false, message: 'Please log in to verify.' });
       return;
     }
-    if (!flagValue.trim()) {
-      setFlagResult({ success: false, message: 'Flag cannot be empty.' });
-      return;
-    }
-    if (!osintValue.trim()) {
-      setFlagResult({ success: false, message: 'Forensics token required. Hint: check robots.txt.' });
+    const token = osintValue.trim();
+    if (!token) {
+      setFlagResult({ success: false, message: 'Enter a forensics token first.' });
       return;
     }
     setFlagSubmitting(true);
     setFlagResult(null);
-    const res = await submitFlagApi({ flag: flagValue.trim(), osint_code: osintValue.trim() }, user.token);
+    const res = await verifyHulkOsint(token, user.token);
     setFlagSubmitting(false);
     if (!res.ok) {
       if (res.status === 401) {
@@ -278,37 +227,14 @@ const GammaWave = () => {
         navigate('/login');
         return;
       }
-      if (res.status === 409) {
-        // Already submitted previously (OSINT was enforced then). Unlock advanced path.
-        try { sessionStorage.setItem('gamma_osint_ok', '1'); } catch {}
-        setOsintOk(true);
-        setFlagResult({ success: false, message: 'Flag already submitted. Advanced CTF unlocked below.' });
-        return;
-      }
-      setFlagResult({ success: false, message: res.error || 'Submission failed' });
+      setFlagResult({ success: false, message: res.error || res.data?.message || 'Verification failed.' });
       return;
     }
-    const q = res.data?.question || '';
-    const av = res.data?.avenger || 'hulk';
-    setBackendQuestion(q);
-    setAvengerKey(av);
-    setFlagResult({ success: true, message: res.data?.message || 'Flag accepted.' });
+    setFlagResult({ success: true, message: res.data?.message || 'Forensics token accepted.' });
     try {
-      // Gate advanced path: mark OSINT + flag submission success
       sessionStorage.setItem('gamma_osint_ok', '1');
-      setOsintOk(true);
     } catch {}
-  };
-
-  const onVerifyToken = (e) => {
-    e.preventDefault();
-    const token = osintValue.trim();
-    if (!token) {
-      setFlagResult({ success: false, message: 'Enter a forensics token first.' });
-      return;
-    }
-    // Client-side confirmation only; backend enforces real validation on submit
-    setFlagResult({ success: true, message: 'Token captured. Now submit the flag.' });
+    setOsintOk(true);
   };
 
   const onSubmitAnswer = async (e) => {
@@ -439,109 +365,51 @@ const GammaWave = () => {
         </div>
       </div>
 
-      {/* Final Submission Flow */}
+      {/* Final Submission Flow: OSINT-only gateway to Advanced CTF */}
       {finalMode && (
         <div className="final-flow">
           <div className="final-panel">
             <h3>Final Submission</h3>
-            {!backendQuestion && (
-              <form onSubmit={onSubmitFlag} className="decode-form">
-                <label htmlFor="flag-input" className="form-label">Final Flag</label>
-                <div className="reveal-box">
-                  <div className="reveal-flag">{FINAL_FLAG_HULK}</div>
+            <form onSubmit={onVerifyToken} className="decode-form">
+              <label htmlFor="osint-input" className="form-label">Forensics Token</label>
+              <div className="input-group">
+                <input
+                  id="osint-input"
+                  type="text"
+                  value={osintValue}
+                  onChange={(e) => setOsintValue(e.target.value)}
+                  placeholder="Enter OSINT code"
+                  className="gamma-input"
+                  autoComplete="off"
+                  disabled={flagSubmitting}
+                />
+                <button className="decode-button" type="submit" disabled={flagSubmitting}>
+                  {flagSubmitting ? 'Verifying...' : 'Verify Token'}
+                </button>
+              </div>
+              <div className="mt-2 text-xs opacity-70">
+                <a href={`${APP_BASE}robots.txt`} target="_blank" rel="noreferrer" className="hover:underline">Open robots.txt</a>
+                <span className="mx-2">•</span>
+                <a href={`${APP_BASE}gamma-logs/index.html`} target="_blank" rel="noreferrer" className="hover:underline">Open gamma-logs</a>
+              </div>
+              {flagResult && (
+                <div className={`api-message ${flagResult.success ? 'success' : 'error'}`}>
+                  {flagResult.message}
                 </div>
-                <div className="input-group">
-                  <input
-                    id="flag-input"
-                    type="text"
-                    value={flagValue}
-                    onChange={(e) => setFlagValue(e.target.value)}
-                    placeholder="Enter flag (e.g., FLAG{...})"
-                    className="gamma-input"
-                    autoComplete="off"
-                    disabled={flagSubmitting}
-                  />
-                  <button type="submit" className="decode-button" disabled={flagSubmitting}>
-                    {flagSubmitting ? 'Submitting...' : 'Submit Flag'}
-                  </button>
-                </div>
-                <label htmlFor="osint-input" className="form-label mt-4">Forensics Token</label>
-                <div className="input-group">
-                  <input
-                    id="osint-input"
-                    type="text"
-                    value={osintValue}
-                    onChange={(e) => setOsintValue(e.target.value)}
-                    placeholder="Enter OSINT code"
-                    className="gamma-input"
-                    autoComplete="off"
-                    disabled={flagSubmitting}
-                  />
-                  <button onClick={onVerifyToken} className="decode-button" type="button" disabled={flagSubmitting}>
-                    Verify Token
-                  </button>
-                </div>
-                <div className="mt-2 text-xs opacity-70">
-                  <a href={`${APP_BASE}robots.txt`} target="_blank" rel="noreferrer" className="hover:underline">Open robots.txt</a>
-                  <span className="mx-2">•</span>
-                  <a href={`${APP_BASE}gamma-logs/index.html`} target="_blank" rel="noreferrer" className="hover:underline">Open gamma-logs</a>
-                </div>
-                {flagResult && (
-                  <div className={`api-message ${flagResult.success ? 'success' : 'error'}`}>
-                    {flagResult.message}
-                  </div>
-                )}
-                {osintOk && !backendQuestion && (
-                  <div className="mt-3">
-                    <button type="button" className="decode-button" onClick={() => navigate('/hulk/advanced')}>
-                      🔐 Proceed to Advanced CTF
-                    </button>
-                    <div className="text-xs opacity-70 mt-1">You already submitted the flag; advanced path is unlocked.</div>
-                  </div>
-                )}
-                <div className="dev-hint text-xs opacity-60 mt-2">
-                  <div>Auth token: {Boolean(user?.token || storedToken) ? 'present' : 'missing'}</div>
-                  <div>API: {API_BASE}</div>
-                </div>
-              </form>
-            )}
-
-            {backendQuestion && (
-              <div className="question-section">
-                <div className="question-box">
-                  <h4>Question</h4>
-                  <p>{backendQuestion}</p>
-                </div>
+              )}
+              {osintOk && (
                 <div className="mt-3">
                   <button type="button" className="decode-button" onClick={() => navigate('/hulk/advanced')}>
                     🔐 Proceed to Advanced CTF
                   </button>
+                  <div className="text-xs opacity-70 mt-1">Forensics token verified; advanced path is unlocked.</div>
                 </div>
-                <form onSubmit={onSubmitAnswer} className="decode-form">
-                  <label htmlFor="answer-input" className="form-label">Your Answer</label>
-                  <div className="input-group">
-                    <input
-                      id="answer-input"
-                      type="text"
-                      value={answerValue}
-                      onChange={(e) => setAnswerValue(e.target.value)}
-                      placeholder="Type your answer"
-                      className="gamma-input"
-                      autoComplete="off"
-                      disabled={answerSubmitting}
-                    />
-                    <button type="submit" className="decode-button" disabled={answerSubmitting}>
-                      {answerSubmitting ? 'Submitting...' : 'Submit Answer'}
-                    </button>
-                  </div>
-                  {answerResult && (
-                    <div className={`api-message ${answerResult.success ? 'success' : 'error'}`}>
-                      {answerResult.message}
-                    </div>
-                  )}
-                </form>
+              )}
+              <div className="dev-hint text-xs opacity-60 mt-2">
+                <div>Auth token: {Boolean(user?.token || storedToken) ? 'present' : 'missing'}</div>
+                <div>API: {API_BASE}</div>
               </div>
-            )}
+            </form>
           </div>
         </div>
       )}

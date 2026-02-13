@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './HulkAdvanced.css';
 import gammaStegoImg from '../assets/img/gamma_stego.png';
 import { useAuth } from '../context/AuthContext';
-import { submitAdvancedFlag as submitAdvancedFlagApi } from '../api/client';
+import { validateHulkCtfStage } from '../api/client';
 
 const HulkAdvanced = () => {
   const navigate = useNavigate();
@@ -49,8 +49,7 @@ const HulkAdvanced = () => {
         navigate('/gamma_wave');
       }
     } catch {}
-    return () => {};
-  }, [ctfStage, attempts]);
+  }, []);
 
   const handlePathChoice = (path) => {
     setPathChoice(path);
@@ -68,19 +67,22 @@ const HulkAdvanced = () => {
     // CTF STAGE 1: Steganography
     // ===================================
     if (ctfStage === 1) {
-      // Hidden text in image: "gamma_encrypted_xk7m"
-      const correctAnswer = 'gamma_encrypted_xk7m';
-      
-      if (trimmedInput.toLowerCase() === correctAnswer.toLowerCase()) {
+      const res = await validateHulkCtfStage(1, trimmedInput, user?.token);
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout?.();
+          navigate('/login');
+          return;
+        }
+        setShowError(true);
+        setErrorMessage(res.error || res.data?.message || 'Incorrect steganography extraction.');
+        setAttempts(prev => prev + 1);
+      } else {
         setCtfStage(2);
         setDiscoveredClues(prev => [...prev, 'stego_decoded']);
         setShowError(false);
         setInputValue('');
         return;
-      } else {
-        setShowError(true);
-        setErrorMessage('Incorrect steganography extraction. Use tools like steghide or strings.');
-        setAttempts(prev => prev + 1);
       }
     }
 
@@ -88,20 +90,22 @@ const HulkAdvanced = () => {
     // CTF STAGE 2: Decrypt Encrypted Text
     // ===================================
     else if (ctfStage === 2) {
-      // XOR decryption: "gamma_encrypted_xk7m" XOR "HULK" = "api.gamma.dev/analyze"
-      const correctEndpoint = '/api/gamma-analyze';
-      
-      if (trimmedInput.toLowerCase().includes('gamma-analyze') || 
-          trimmedInput.toLowerCase().includes('gamma/analyze')) {
+      const res = await validateHulkCtfStage(2, trimmedInput, user?.token);
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout?.();
+          navigate('/login');
+          return;
+        }
+        setShowError(true);
+        setErrorMessage(res.error || res.data?.message || 'Wrong endpoint.');
+        setAttempts(prev => prev + 1);
+      } else {
         setCtfStage(3);
         setDiscoveredClues(prev => [...prev, 'endpoint_found']);
         setShowError(false);
         setInputValue('');
         return;
-      } else {
-        setShowError(true);
-        setErrorMessage('Wrong endpoint. Deobfuscate the JS code or decrypt the text.');
-        setAttempts(prev => prev + 1);
       }
     }
 
@@ -109,37 +113,23 @@ const HulkAdvanced = () => {
     // CTF STAGE 3: JWT Token Generation
     // ===================================
     else if (ctfStage === 3) {
-      // Valid JWT format check
-      const jwtPattern = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
-      
-      if (jwtPattern.test(trimmedInput)) {
-        // Decode and verify JWT
-        try {
-          const parts = trimmedInput.split('.');
-          const payload = JSON.parse(atob(parts[1]));
-          
-          // Check for admin role and specific user
-          if (payload.role === 'admin' && payload.user === 'banner') {
-            setJwtToken(trimmedInput);
-            setCtfStage(4);
-            setDiscoveredClues(prev => [...prev, 'jwt_crafted']);
-            setShowError(false);
-            setInputValue('');
-            return;
-          } else {
-            setShowError(true);
-            setErrorMessage('JWT valid but insufficient privileges. Need role:admin, user:banner');
-            setAttempts(prev => prev + 1);
-          }
-        } catch (err) {
-          setShowError(true);
-          setErrorMessage('Invalid JWT format. Check header.payload.signature structure.');
-          setAttempts(prev => prev + 1);
+      const res = await validateHulkCtfStage(3, trimmedInput, user?.token);
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout?.();
+          navigate('/login');
+          return;
         }
-      } else {
         setShowError(true);
-        setErrorMessage('Invalid JWT format. Must be header.payload.signature');
+        setErrorMessage(res.error || res.data?.message || 'Invalid JWT.');
         setAttempts(prev => prev + 1);
+      } else {
+        setJwtToken(trimmedInput);
+        setCtfStage(4);
+        setDiscoveredClues(prev => [...prev, 'jwt_crafted']);
+        setShowError(false);
+        setInputValue('');
+        return;
       }
     }
 
@@ -147,55 +137,22 @@ const HulkAdvanced = () => {
     // CTF STAGE 4: SQL Injection
     // ===================================
     else if (ctfStage === 4) {
-      // SQL injection payloads
-      const sqlPayloads = [
-        "' OR '1'='1",
-        "' OR 1=1--",
-        "' UNION SELECT flag FROM secrets--",
-        "admin'--",
-        "' OR 'a'='a"
-      ];
-
-      const isSqlInjection = sqlPayloads.some(payload => 
-        trimmedInput.includes(payload) || 
-        trimmedInput.toLowerCase().includes('union') ||
-        trimmedInput.toLowerCase().includes("' or '") ||
-        trimmedInput.toLowerCase().includes('1=1')
-      );
-
-      if (isSqlInjection) {
-        // Simulate SQL injection success; now submit final flag to backend
-        const flag = 'FLAG{HULK_GAMMA_MASTER_2026}';
-        setApiResponse(flag);
+      const res = await validateHulkCtfStage(4, trimmedInput, user?.token);
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout?.();
+          navigate('/login');
+          return;
+        }
+        setShowError(true);
+        setErrorMessage(res.error || res.data?.message || 'Query failed.');
+        setAttempts(prev => prev + 1);
+      } else {
+        const flag = res.data?.flag;
+        setApiResponse(flag || '');
         setDiscoveredClues(prev => [...prev, 'sql_exploited']);
         setShowError(false);
-
-        // Submit advanced flag for points + stone, then redirect to Challenges
-        const submitFinal = async () => {
-          if (!isLoggedIn || !user?.token) {
-            setErrorMessage('Please log in to submit final flag.');
-            setShowError(true);
-            return;
-          }
-          const res = await submitAdvancedFlagApi(flag, user.token);
-          if (!res.ok) {
-            if (res.status === 401) {
-              logout?.();
-              navigate('/login');
-              return;
-            }
-            setErrorMessage(res.error || 'Final submission failed');
-            setShowError(true);
-            return;
-          }
-          navigate('/challenges');
-        };
-        submitFinal();
         return;
-      } else {
-        setShowError(true);
-        setErrorMessage('Query failed. Try SQL injection techniques.');
-        setAttempts(prev => prev + 1);
       }
     }
 
@@ -210,7 +167,7 @@ const HulkAdvanced = () => {
             <h3>🔍 STAGE 1: Steganography</h3>
             <div className="challenge-description">
               <p>Dr. Banner encoded secret data within this gamma radiation scan image.</p>
-              <p>Extract the hidden message using steganography tools.</p>
+              <p>Extract the hidden message from the image.</p>
             </div>
 
             <div className="stego-image-container">
@@ -237,7 +194,7 @@ const HulkAdvanced = () => {
           <div className="ctf-stage">
             <h3>🔓 STAGE 2: Decrypt & Deobfuscate</h3>
             <div className="challenge-description">
-              <p>You found encrypted text: <code>gamma_encrypted_xk7m</code></p>
+              <p>Use the encrypted text recovered in the previous stage.</p>
               <p>Deobfuscate the JavaScript code below to find the API endpoint.</p>
             </div>
 
@@ -255,6 +212,9 @@ const HulkAdvanced = () => {
             <div className="challenge-description">
               <p>API endpoint found: <code>/api/gamma-analyze</code></p>
               <p>This endpoint requires JWT authentication with admin privileges.</p>
+              <p className="hint-text text-xs opacity-70 mt-2">
+                Hint: The signing secret echoes HULK, the year, and NEXUS.
+              </p>
             </div>
 
             <div className="jwt-info">
@@ -301,11 +261,11 @@ query = "SELECT * FROM gamma_data WHERE sample_id = '" + user_input + "'"
     return (
       <div className="path-selection-container">
         <div className="gamma-header">
-          <h1 className="pulse-text">🟢 HULK CHALLENGE PATHS 🟢</h1>
-          <p className="subtitle">Choose Your Challenge Route</p>
+          <h1 className="pulse-text">🟢 HULK ADVANCED CTF 🟢</h1>
+          <p className="subtitle">Deep-dive exploitation challenge</p>
         </div>
 
-        <div className="path-options">
+        <div className="path-options single-path">
           <div className="path-card ctf-path" onClick={() => handlePathChoice('ctf')}>
             <div className="path-icon">🔐</div>
             <h2>Advanced CTF Path</h2>
@@ -319,25 +279,8 @@ query = "SELECT * FROM gamma_data WHERE sample_id = '" + user_input + "'"
               <li>🔑 JWT token exploitation</li>
               <li>💉 SQL injection attacks</li>
             </ul>
-            <p className="path-reward">Reward: FLAG{'{HULK_GAMMA_MASTER_2026}'}</p>
+            <p className="path-reward">Reward: Final Flag</p>
             <p className="estimated-time">⏱️ Est. Time: 45-90 minutes</p>
-          </div>
-
-          <div className="path-card logic-path" onClick={() => handlePathChoice('logic')}>
-            <div className="path-icon">🧩</div>
-            <h2>Logic Puzzle Path</h2>
-            <div className="difficulty-badge hard">HARD</div>
-            <p className="path-description">
-              Multi-stage logic and cipher challenges:
-            </p>
-            <ul className="path-features">
-              <li>🔢 Binary reversal puzzle</li>
-              <li>🎨 Color chemistry riddle</li>
-              <li>🧠 Deductive logic grid</li>
-              <li>🔍 Pattern recognition</li>
-            </ul>
-            <p className="path-reward">Reward: Time Stone + Question</p>
-            <p className="estimated-time">⏱️ Est. Time: 35-50 minutes</p>
           </div>
         </div>
       </div>
@@ -418,9 +361,22 @@ query = "SELECT * FROM gamma_data WHERE sample_id = '" + user_input + "'"
         {/* API Response (Stage 4 success) */}
         {apiResponse && (
           <div className="api-response success">
-            <h4>🎉 SQL Injection Successful!</h4>
+            <h4>🎉 Final Flag Unlocked</h4>
             <pre className="flag-display">{apiResponse}</pre>
-            <p>Redirecting to final submission...</p>
+            <button
+              type="button"
+              className="decode-button mt-3"
+              onClick={async () => {
+                try {
+                  if (navigator.clipboard && apiResponse) {
+                    await navigator.clipboard.writeText(apiResponse);
+                  }
+                } catch {}
+                navigate('/challenges');
+              }}
+            >
+              Copy Flag &amp; Return to Challenges
+            </button>
           </div>
         )}
 

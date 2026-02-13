@@ -90,4 +90,39 @@ export async function submitAdvancedFlag(finalFlag, token) {
   });
 }
 
-export const api = { signup, login, getTeamActivity, getLeaderboard, submitFlag, submitAnswer, submitAdvancedFlag };
+export async function verifyHulkOsint(osint_code, token) {
+  return request('/game/hulk-osint', {
+    method: 'POST',
+    body: { osint_code },
+    token,
+  });
+}
+
+export async function validateHulkLogicStage(stage, answer, token) {
+  return request('/game/hulk-logic-stage', {
+    method: 'POST',
+    body: { stage, answer },
+    token,
+  });
+}
+
+export async function validateHulkCtfStage(stage, value, token) {
+  return request('/game/hulk-ctf-stage', {
+    method: 'POST',
+    body: { stage, value },
+    token,
+  });
+}
+
+export const api = {
+  signup,
+  login,
+  getTeamActivity,
+  getLeaderboard,
+  submitFlag,
+  submitAnswer,
+  submitAdvancedFlag,
+  verifyHulkOsint,
+  validateHulkLogicStage,
+  validateHulkCtfStage,
+};
