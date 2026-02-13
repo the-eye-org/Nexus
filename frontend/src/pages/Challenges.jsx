@@ -14,15 +14,15 @@ import imgThor from '../assets/img/thor2.png';
 import imgIronman from '../assets/img/ironman2.png';
 import imgHulk from '../assets/img/hulk.png';
 import imgDeadpool from '../assets/img/deadpool.png';
-import imgBw from '../assets/img/hawkeye.png';
+import imgHawkeye from '../assets/img/hawkeye.png';
 
 const HERO_CHALLENGES = [
-  { id: 'cap', hero: 'Captain America', image: imgCa, title: 'Shield Decode', description: 'Crack the cipher hidden in the shield.', points: 100, difficulty: "Easy" },
-  { id: 'thor', hero: 'Thor', image: imgThor, title: 'Stormbreaker Logic', description: 'Find the flag in the storm.', points: 150, difficulty: "Medium" },
-  { id: 'ironman', hero: 'Iron Man', image: imgIronman, title: 'Arc Reactor', description: 'Reverse the reactor output.', points: 125, difficulty: "Medium" },
-  { id: 'hulk', hero: 'Hulk', image: imgHulk, title: 'Gamma Decode', description: 'Decode the gamma message.', points: 100, difficulty: "Easy" },
-  { id: 'deadpool', hero: 'Deadpool', image: imgDeadpool, title: 'Fourth Wall', description: 'Break the fourth wall to find the flag.', points: 175, difficulty: "Hard" },
-  { id: 'hawkeye', hero: 'Hawkeye', image: imgBw, title: 'Steganography', description: 'Something is hidden in the image.', points: 125, difficulty: "Medium" },
+  { id: 'ironman', hero: 'Iron Man', image: imgIronman, title: 'Arc Reactor', description: 'Reverse the reactor output.', points: 200, difficulty: "Medium" },
+  { id: 'cap', hero: 'Captain America', image: imgCa, title: 'Shield Decode', description: 'Crack the cipher hidden in the shield.', points: 200, difficulty: "Medium" },
+  { id: 'thor', hero: 'Thor', image: imgThor, title: 'Stormbreaker Logic', description: 'Find the flag in the storm.', points: 150, difficulty: "Easy" },
+  { id: 'deadpool', hero: 'Deadpool', image: imgDeadpool, title: 'Fourth Wall', description: 'Break the fourth wall to find the flag.', points: 300, difficulty: "Expert" },
+  { id: 'hulk', hero: 'Hulk', image: imgHulk, title: 'Gamma Decode', description: 'Decode the gamma message.', points: 150, difficulty: "Easy" },
+  { id: 'hawkeye', hero: 'Hawkeye', image: imgHawkeye, title: 'Bullseye Accuracy', description: 'Hit the target with perfect timing.', points: 200, difficulty: "Medium" },
 ];
 
 // Static file routes per avenger (served from FR public under /nexus)
@@ -33,7 +33,7 @@ const CHALLENGE_LINKS = {
   ironman: '/nexus/ironman/index.html',
   deadpool: '/nexus/deadpool/index.html',
   hulk: null,
-  hawkeye: null,
+  hawkeye: '/nexus/hawkeye/index.html',
 };
 
 const slideVariants = {

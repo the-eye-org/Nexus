@@ -34,42 +34,42 @@ def seed_game_flags():
     
     default_flags = {
         "ironman": {
-            "flag": "FLAG{ARC_REACTOR_CORE}", 
+            "flag": "neXus{t0ny_st4rk_1s_ir0nm4n}", 
             "stone": "power",
             "points": 200,
             "question": "What element did Tony Stark synthesize to replace Palladium?",
             "answer": "vibranium"
         },
         "captainamerica": {
-            "flag": "FLAG{SUPER_SOLDIER}", 
+            "flag": "neXus{r0g3rs}", 
             "stone": "time",
             "points": 200,
             "question": "What is Captain America's shield made of?",
             "answer": "vibranium"
         },
         "thor": {
-            "flag": "FLAG{BIFROST_GUARDIAN}", 
+            "flag": "neXus{wr7hy_0f_mj0ln1r}", 
             "stone": "space",
             "points": 150,
             "question": "What is the name of Thor's hammer?",
             "answer": "mjolnir"
         },
         "deadpool": {
-            "flag": "neXus{ch1m1ch4ng4s}", 
+            "flag": "flag{w4d3_l0v3s_ch1m1ch4ng4s_4nd_sqli}", 
             "stone": "soul",
             "points": 300,
             "question": "What is Deadpool's favorite food?",
             "answer": "chimichangas"
         },
         "hulk": {
-            "flag": "FLAG{GAMMA_RADIATION}", 
+            "flag": "neXus{H0LK_G1MM1_ENTRY}", 
             "stone": "mind",
             "points": 150,
             "question": "Who created Ultron?",
             "answer": "tony stark"
         },
         "hawkeye": {
-            "flag": "FLAG{NEVER_MISS}", 
+            "flag": "neXus{a1m_f0r_th3_h34rt}", 
             "stone": "reality",
             "points": 200,
             "question": "What happened to Hawkeye's family?",

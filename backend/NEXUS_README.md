@@ -355,12 +355,12 @@ STONE_MAPPING = {
 
 | Avenger | Flag | Stone | Question | Answer |
 |---------|------|-------|----------|--------|
-| Iron Man | `FLAG{ARC_REACTOR_CORE}` | Power | What element did Tony Stark synthesize? | vibranium |
-| Captain America | `FLAG{SUPER_SOLDIER}` | Time | What is Cap's shield made of? | vibranium |
-| Thor | `FLAG{BIFROST_GUARDIAN}` | Space | What is Thor's hammer called? | mjolnir |
-| Deadpool | `neXus{ch1m1ch4ng4s}` | Soul | What is Deadpool's favorite food? | chimichangas |
-| Hulk | `FLAG{GAMMA_RADIATION}` | Mind | Who created Ultron? | tony stark |
-| Hawkeye | `FLAG{NEVER_MISS}` | Reality | What happened to Hawkeye's family? | snapped |
+| Iron Man | `neXus{t0ny_st4rk_1s_ir0nm4n}` | Power | What element did Tony Stark synthesize? | vibranium |
+| Captain America | `neXus{r0g3rs}` | Time | What is Cap's shield made of? | vibranium |
+| Thor | `neXus{wr7hy_0f_mj0ln1r}` | Space | What is Thor's hammer called? | mjolnir |
+| Deadpool | `flag{w4d3_l0v3s_ch1m1ch4ng4s_4nd_sqli}` | Soul | What is Deadpool's favorite food? | chimichangas |
+| Hulk | `neXus{H0LK_G1MM1_ENTRY}` | Mind | Who created Ultron? | tony stark |
+| Hawkeye | `neXus{a1m_f0r_th3_h34rt}` | Reality | What happened to Hawkeye's family? | snapped |
 
 ---
 
