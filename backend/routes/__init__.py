@@ -2,3 +2,4 @@
 from routes.auth import auth_bp
 from routes.game import game_bp
 from routes.leaderboard import leaderboard_bp
+from routes.wade_api import wade_bp

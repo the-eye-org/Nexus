@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arc Reactor UI Preview — No Auth</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #050508;
+            color: #c0e8f0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00eaff;
+            text-shadow: 0 0 15px rgba(0,234,255,0.4);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border: 1px solid rgba(0,234,255,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0,20,30,0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        .card-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(0,234,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header h2 {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #69f1f1;
+        }
+
+        .card-header .badge {
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            border: 1px solid rgba(0,234,255,0.25);
+            border-radius: 20px;
+            color: #69f1f1;
+            opacity: 0.7;
+        }
+
+        .card iframe {
+            width: 100%;
+            height: 680px;
+            border: none;
+            background: #000;
+        }
+
+        .note {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 30px;
+            opacity: 0.35;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 560px) {
+            .grid { grid-template-columns: 1fr; }
+            .card iframe { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Arc Reactor UI Preview</h1>
+    <p class="subtitle">Auth bypassed — all pages rendered directly</p>
+
+    <div class="grid">
+        <div class="card">
+            <div class="card-header">
+                <h2>ironman.html</h2>
+                <span class="badge">SVG Reactor + React</span>
+            </div>
+            <iframe id="frame-ironman" src="about:blank"></iframe>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>iron_man.html</h2>
+                <span class="badge">SVG Reactor + React</span>
+            </div>
+            <iframe id="frame-iron-man" src="about:blank"></iframe>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>core.html</h2>
+                <span class="badge">Canvas Reactor + Keypad</span>
+            </div>
+            <iframe id="frame-core" src="about:blank"></iframe>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>diagnostics.html</h2>
+                <span class="badge">Pulse Selector</span>
+            </div>
+            <iframe id="frame-diag" src="about:blank"></iframe>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>index.html</h2>
+                <span class="badge">Intro / Landing</span>
+            </div>
+            <iframe id="frame-index" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <p class="note">This page is for development preview only. Delete before production.</p>
+
+    <script>
+        // Pre-set auth requirements so core.html doesn't block
+        // sessionStorage is per-origin, so setting it here makes it available to same-origin iframes
+        sessionStorage.setItem("ironman_unlock", "1");
+
+        // Set the cookie so core.html shows the flag too
+        document.cookie = "arc_reactor=stable; path=/";
+
+        // Now load all iframes
+        document.getElementById("frame-ironman").src = "ironman.html";
+        document.getElementById("frame-iron-man").src = "iron_man.html";
+        document.getElementById("frame-core").src = "core.html";
+        document.getElementById("frame-diag").src = "diagnostics.html";
+        document.getElementById("frame-index").src = "index.html";
+    </script>
+
+</body>
+</html>

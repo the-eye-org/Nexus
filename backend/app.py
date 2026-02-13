@@ -3,7 +3,7 @@ from flask_cors import CORS
 from config import Config
 from extensions import jwt, limiter
 from models import init_db, seed_game_flags
-from routes import auth_bp, game_bp, leaderboard_bp
+from routes import auth_bp, game_bp, leaderboard_bp,wade_bp
 
 def create_app():
     """NEXUS Game v2.0 Application Factory (Team Auth)."""
@@ -19,6 +19,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/nex-backend/api/auth")
     app.register_blueprint(game_bp, url_prefix="/nex-backend/api/game")
     app.register_blueprint(leaderboard_bp, url_prefix="/nex-backend/api/leaderboard")
+    app.register_blueprint(wade_bp, url_prefix="/nex-backend/wade")
     
     @app.route("/nex-backend")
     def base_route():
