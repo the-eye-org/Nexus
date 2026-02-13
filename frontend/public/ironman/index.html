@@ -68,11 +68,9 @@
         .scanlines {
             position: fixed;
             inset: 0;
-            background: repeating-linear-gradient(
-                rgba(0,255,255,0.03) 0px,
-                rgba(0,255,255,0.03) 1px,
-                transparent 2px
-            );
+            background: repeating-linear-gradient(rgba(0, 255, 255, 0.03) 0px,
+                    rgba(0, 255, 255, 0.03) 1px,
+                    transparent 2px);
             pointer-events: none;
             z-index: 2;
         }
@@ -165,8 +163,12 @@
 
         const introVideo = document.getElementById("introVideo");
         const skipBtn = document.getElementById("skipIntro");
+        let introSkipped = false;
 
         function skipIntro() {
+            if (introSkipped) return;
+            introSkipped = true;
+
             const video = document.getElementById("introVideo");
             const ui = document.getElementById("mainUI");
             const story = document.getElementById("storyText");
@@ -185,16 +187,36 @@
 
                 document.body.style.overflow = "auto";
                 document.body.style.height = "150vh";
-            }, 1500);
+            }, 1000);
         }
 
         introVideo.onended = skipIntro;
         introVideo.onerror = skipIntro;
 
+        // Show skip button after 2 seconds
         setTimeout(() => {
-            skipBtn.classList.add("visible");
+            if (!introSkipped) {
+                skipBtn.classList.add("visible");
+            }
         }, 2000);
+
+        // Failsafe: If video hasn't started playing within 6 seconds, just skip it
+        setTimeout(() => {
+            if (!introSkipped && introVideo.readyState < 3) {
+                console.warn("Video failed to play in time. Skipping.");
+                skipIntro();
+            }
+        }, 6000);
+
+        // Explicitly try to play the video on load
+        window.addEventListener('load', () => {
+            introVideo.play().catch(err => {
+                console.warn("Autoplay was blocked:", err);
+                skipBtn.classList.add("visible");
+            });
+        });
     </script>
 
 </body>
+
 </html>
