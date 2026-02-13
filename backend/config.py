@@ -21,15 +21,15 @@ class Config:
     POINTS_FLAG = 100
     POINTS_ANSWER = 500  # Bonus for solving Question -> Stone
     
-    AVENGERS = ["ironman", "thor", "hulk", "captainamerica", "blackwidow", "hawkeye"]
+    AVENGERS = ["ironman", "captainamerica", "thor", "deadpool", "hulk", "hawkeye"]
     
     # Stone Mapping
     STONE_MAPPING = {
         "ironman": "power",
-        "thor": "space",
-        "hulk": "mind",
         "captainamerica": "time",
-        "blackwidow": "soul",
+        "thor": "space",
+        "deadpool": "soul",
+        "hulk": "mind",
         "hawkeye": "reality"
     }
     

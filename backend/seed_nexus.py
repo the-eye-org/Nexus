@@ -32,12 +32,12 @@ def main():
     print(f"   - Cooldown: {Config.COOLDOWN_DURATION_MINUTES} minutes")
     
     print("\n🎯 Default Flags (FOR TESTING ONLY - CHANGE IN PRODUCTION):")
-    print("   - Iron Man: FLAG{ARC_REACTOR_CORE}")
-    print("   - Thor: FLAG{BIFROST_GUARDIAN}")
-    print("   - Hulk: FLAG{GAMMA_RADIATION}")
-    print("   - Captain America: FLAG{SUPER_SOLDIER}")
-    print("   - Black Widow: FLAG{RED_ROOM_PROTOCOL}")
-    print("   - Hawkeye: FLAG{NEVER_MISS}")
+    print("   - Iron Man: neXus{t0ny_st4rk_1s_ir0nm4n}")
+    print("   - Captain America: neXus{r0g3rs}")
+    print("   - Thor: neXus{wr7hy_0f_mj0ln1r}")
+    print("   - Deadpool: flag{w4d3_l0v3s_ch1m1ch4ng4s_4nd_sqli}")
+    print("   - Hulk: neXus{H0LK_G1MM1_ENTRY}")
+    print("   - Hawkeye: neXus{a1m_f0r_th3_h34rt}")
     
     print("\n🚀 Ready to start backend with: python app.py")
     print()
