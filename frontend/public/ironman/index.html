@@ -14,13 +14,11 @@
         body {
             margin: 0;
             overflow: hidden;
-            /* disable scroll until intro video ends */
             font-family: 'Orbitron', sans-serif;
             background: black;
             color: #00eaff;
         }
 
-        /* ---------- INTRO VIDEO ---------- */
         #introVideo {
             position: fixed;
             inset: 0;
@@ -58,7 +56,6 @@
             pointer-events: auto;
         }
 
-        /* Background image */
         .bg {
             position: fixed;
             inset: 0;
@@ -68,18 +65,18 @@
             z-index: 1;
         }
 
-        /* Blue holographic scanlines */
         .scanlines {
             position: fixed;
             inset: 0;
-            background: repeating-linear-gradient(rgba(0, 255, 255, 0.03) 0px,
-                    rgba(0, 255, 255, 0.03) 1px,
-                    transparent 2px);
+            background: repeating-linear-gradient(
+                rgba(0,255,255,0.03) 0px,
+                rgba(0,255,255,0.03) 1px,
+                transparent 2px
+            );
             pointer-events: none;
             z-index: 2;
         }
 
-        /* Main container */
         .container {
             position: absolute;
             top: 50%;
@@ -95,18 +92,15 @@
             box-shadow: 0 0 20px #0ff5, inset 0 0 20px #0ff4;
             border-radius: 12px;
             opacity: 0;
-            /* HIDDEN UNTIL VIDEO ENDS */
             transition: opacity 1.5s ease;
             z-index: 3;
         }
 
         h1 {
             font-size: 2rem;
-            margin-bottom: 10px;
             text-shadow: 0 0 10px #0ff;
         }
 
-        /* Story text appears only after video */
         .story-text {
             font-size: 1.05rem;
             line-height: 1.6;
@@ -117,7 +111,6 @@
             transition: opacity 2.5s ease, transform 2.5s ease;
         }
 
-        /* Button */
         .btn-start {
             margin-top: 35px;
             padding: 15px 35px;
@@ -127,7 +120,6 @@
             background: rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
             text-transform: uppercase;
             text-shadow: 0 0 8px #00eaff;
         }
@@ -137,47 +129,11 @@
             color: black;
             box-shadow: 0 0 20px #00eaff;
         }
-
-        /* Iron Man Suit */
-        .suit-container {
-            position: fixed;
-            bottom: -100%;
-            right: 5%;
-            width: 300px;
-            height: 600px;
-            opacity: 0;
-            transition: opacity 0.8s ease, bottom 0.8s ease;
-            pointer-events: none;
-            z-index: 4;
-        }
-
-        .suit-container.visible {
-            opacity: 1;
-            bottom: 0;
-        }
-
-        .suit-svg {
-            filter: drop-shadow(0 0 20px #ff6600) drop-shadow(0 0 40px #ff3300);
-            animation: suitPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes suitPulse {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 0 20px #ff6600) drop-shadow(0 0 40px #ff3300);
-            }
-
-            50% {
-                filter: drop-shadow(0 0 30px #ff6600) drop-shadow(0 0 50px #ff3300);
-            }
-        }
     </style>
 </head>
 
 <body>
 
-    <!-- INTRO VIDEO -->
     <video id="introVideo" autoplay muted playsinline preload="auto">
         <source src="intro_arc_start.mp4" type="video/mp4">
     </video>
@@ -187,27 +143,7 @@
     <div class="bg"></div>
     <div class="scanlines"></div>
 
-    <!-- Iron Man Suit -->
-    <div class="suit-container" id="suitContainer">
-        <svg class="suit-svg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
-            <!-- Helmet -->
-            <circle cx="100" cy="50" r="35" fill="#ff6600" stroke="#ffaa00" stroke-width="2" />
-            <!-- Eyes -->
-            <circle cx="85" cy="45" r="6" fill="#ffff00" />
-            <circle cx="115" cy="45" r="6" fill="#ffff00" />
-            <!-- Jaw -->
-            <path d="M 75 70 Q 100 80 125 70" stroke="#ffaa00" stroke-width="2" fill="none" />
-            <!-- Reactor -->
-            <circle cx="100" cy="130" r="25" fill="none" stroke="#ffff00" stroke-width="3" />
-            <circle cx="100" cy="130" r="20" fill="none" stroke="#ff6600" stroke-width="2" />
-            <circle cx="100" cy="130" r="15" fill="#ffff00" opacity="0.6" />
-            <!-- Body -->
-            <rect x="70" y="90" width="60" height="80" fill="#ff6600" stroke="#ffaa00" stroke-width="2" rx="5" />
-            <!-- Arms + Legs + Boots Skipped for compactness -->
-        </svg>
-    </div>
-
-    <!-- MAIN UI (HIDDEN UNTIL VIDEO ENDS) -->
+    <!-- MAIN UI -->
     <div class="container" id="mainUI">
         <h1>STARK FAIL-SAFE MODE ACTIVATED</h1>
 
@@ -223,21 +159,10 @@
     </div>
 
     <script>
-        /* Redirect button */
         function begin() {
             window.location.href = "ironman.html";
         }
 
-        /* Suit reveal */
-        let suitShown = false;
-        window.addEventListener("scroll", () => {
-            if (window.scrollY > 200 && !suitShown) {
-                document.getElementById("suitContainer").classList.add("visible");
-                suitShown = true;
-            }
-        });
-
-        /* INTRO VIDEO END LOGIC */
         const introVideo = document.getElementById("introVideo");
         const skipBtn = document.getElementById("skipIntro");
 
@@ -252,42 +177,24 @@
             setTimeout(() => {
                 video.style.display = "none";
                 ui.style.opacity = "1";
+
                 setTimeout(() => {
                     story.style.opacity = "1";
                     story.style.transform = "translateY(0)";
                 }, 500);
+
                 document.body.style.overflow = "auto";
                 document.body.style.height = "150vh";
             }, 1500);
         }
 
         introVideo.onended = skipIntro;
+        introVideo.onerror = skipIntro;
 
-        // Error handling - if video fails to load, skip to UI
-        introVideo.onerror = () => {
-            console.error("Video failed to load.");
-            skipIntro();
-        };
-
-        // Show skip button after 2 seconds if video hasn't ended
         setTimeout(() => {
-            if (introVideo && introVideo.style.display !== "none") {
-                skipBtn.classList.add("visible");
-            }
+            skipBtn.classList.add("visible");
         }, 2000);
-
-        // Explicitly try to play the video on window load
-        window.addEventListener('load', () => {
-            if (introVideo) {
-                introVideo.play().catch(err => {
-                    console.warn("Autoplay was blocked or failed:", err);
-                    // If blocked, ensure the skip button is visible so the user can proceed
-                    skipBtn.classList.add("visible");
-                });
-            }
-        });
     </script>
 
 </body>
-
 </html>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Diagnostics Panel</title>
     <style>
@@ -34,25 +33,31 @@
 > Running scan...
 > Arc Reactor unstable.
 > Select correct frequency pulse.
-</pre>
+    </pre>
 
     <button class="pulse">Pulse</button>
     <button class="pulse">Pulse</button>
     <button class="pulse">Pulse</button>
 
     <script>
-        document.querySelectorAll(".pulse")[1].onclick = function () {
+        const pulses = document.querySelectorAll(".pulse");
+
+        // Correct pulse
+        pulses[1].onclick = function () {
             sessionStorage.setItem("ironman_unlock", "1");
             window.location.href = "core.html";
         };
-        document.querySelectorAll(".pulse")[0].onclick = function () {
+
+        // Wrong pulse
+        pulses[0].onclick = function () {
             alert("Incorrect pulse frequency!");
         };
-        document.querySelectorAll(".pulse")[2].onclick = function () {
+
+        // Wrong pulse
+        pulses[2].onclick = function () {
             alert("Reactor destabilized! Try again.");
         };
     </script>
 
 </body>
-
 </html>
