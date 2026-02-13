@@ -54,7 +54,7 @@ const About = () => {
 
                 <div className='about-subtext z-10'>
                     <p className="text-white/90">
-                        A college CTF with a Marvel twist. Solve challenges, capture flags, and climb the leaderboard.
+                        A college CTF with a Marvel twist. Solve challenges and capture flags.
                     </p>
                     <p className='text-white/60'>
                         New to CTFs? No worries—our challenges are beginner-friendly and fun.
