@@ -5,7 +5,7 @@
     <title>Arc Reactor Core</title>
     <style>
         body {
-            background: black;
+            background: #000;
             text-align: center;
             padding-top: 40px;
             font-family: monospace;
@@ -13,8 +13,9 @@
         }
 
         canvas {
-            border: 2px solid #00eaff;
             margin-top: 20px;
+            border-radius: 12px;
+            cursor: crosshair;
         }
 
         .modal {
@@ -300,30 +301,261 @@
         // Draw Arc Reactor
         let c = document.getElementById("reactor");
         let ctx = c.getContext("2d");
+        const CX = 200, CY = 200;
+        let frame = 0;
 
-        // Reactor drawing
         function drawReactor() {
-            ctx.fillStyle = "#001016";
+            ctx.clearRect(0, 0, 400, 400);
+
+            // Background fill
+            let bgGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, 200);
+            bgGrad.addColorStop(0, "#021a22");
+            bgGrad.addColorStop(1, "#000000");
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, 400, 400);
 
-            // Outer ring
+            let t = frame * 0.008;
+            let pulse = 0.85 + 0.15 * Math.sin(t * 2.5);
+            let slowSpin = t * 0.15;
+            let fastSpin = t * 0.4;
+
+            ctx.save();
+
+            // ──── Ambient glow ────
+            let ambientGrad = ctx.createRadialGradient(CX, CY, 40, CX, CY, 195);
+            ambientGrad.addColorStop(0, `rgba(105,241,241,${0.06 * pulse})`);
+            ambientGrad.addColorStop(1, "rgba(105,241,241,0)");
+            ctx.fillStyle = ambientGrad;
             ctx.beginPath();
-            ctx.strokeStyle = "#00eaff";
-            ctx.lineWidth = 8;
-            ctx.arc(200, 200, 150, 0, 2 * Math.PI);
+            ctx.arc(CX, CY, 195, 0, Math.PI * 2);
+            ctx.fill();
+
+            // ──── Outer housing ring (brushed metal) ────
+            ctx.lineWidth = 24;
+            let metalGrad = ctx.createLinearGradient(30, 30, 370, 370);
+            metalGrad.addColorStop(0, "#3d3d3d");
+            metalGrad.addColorStop(0.2, "#585858");
+            metalGrad.addColorStop(0.4, "#2e2e2e");
+            metalGrad.addColorStop(0.6, "#505050");
+            metalGrad.addColorStop(0.8, "#3a3a3a");
+            metalGrad.addColorStop(1, "#484848");
+            ctx.strokeStyle = metalGrad;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 160, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Beams (fake)
-            for (let i = 0; i < 8; i++) {
-                let angle = i * (Math.PI / 4);
+            // Outer bevel highlights
+            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = "rgba(200,240,255,0.1)";
+            ctx.beginPath(); ctx.arc(CX, CY, 172, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = "rgba(200,240,255,0.07)";
+            ctx.beginPath(); ctx.arc(CX, CY, 148, 0, Math.PI * 2); ctx.stroke();
+
+            // Engraved notch marks on outer ring
+            ctx.save();
+            ctx.translate(CX, CY);
+            ctx.rotate(slowSpin * 0.1);
+            for (let i = 0; i < 48; i++) {
+                let a = (i / 48) * Math.PI * 2;
+                ctx.strokeStyle = "rgba(0,0,0,0.3)";
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.strokeStyle = "#005f75";
-                ctx.lineWidth = 5;
-                ctx.moveTo(200, 200);
-                ctx.lineTo(200 + Math.cos(angle) * 120, 200 + Math.sin(angle) * 120);
+                ctx.moveTo(Math.cos(a) * 149, Math.sin(a) * 149);
+                ctx.lineTo(Math.cos(a) * 171, Math.sin(a) * 171);
                 ctx.stroke();
             }
+            ctx.restore();
 
+            // ──── Blue glow channel (behind coils) ────
+            ctx.lineWidth = 26;
+            ctx.strokeStyle = `rgba(105,241,241,${0.12 * pulse})`;
+            ctx.shadowColor = "rgba(105,241,241,0.3)";
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 132, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // ──── 10 Copper coil segments ────
+            ctx.save();
+            ctx.translate(CX, CY);
+            ctx.rotate(slowSpin);
+            let numCoils = 10;
+            let coilArc = (Math.PI * 2) / numCoils;
+            let coilGap = 0.14;
+            for (let i = 0; i < numCoils; i++) {
+                let startAngle = i * coilArc + coilGap / 2;
+                let endAngle = (i + 1) * coilArc - coilGap / 2;
+
+                // Copper fill
+                let cGrad = ctx.createLinearGradient(
+                    Math.cos(startAngle) * 130, Math.sin(startAngle) * 130,
+                    Math.cos(endAngle) * 130, Math.sin(endAngle) * 130
+                );
+                cGrad.addColorStop(0, "#cd8032");
+                cGrad.addColorStop(0.3, "#e8a050");
+                cGrad.addColorStop(0.5, "#b87333");
+                cGrad.addColorStop(0.7, "#d4944a");
+                cGrad.addColorStop(1, "#9a6328");
+                ctx.lineWidth = 20;
+                ctx.strokeStyle = cGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, 132, startAngle, endAngle);
+                ctx.stroke();
+
+                // Wire detail lines on each coil
+                ctx.lineWidth = 0.8;
+                ctx.strokeStyle = "rgba(90,60,20,0.5)";
+                let wireCount = 8;
+                for (let w = 0; w < wireCount; w++) {
+                    let wa = startAngle + ((endAngle - startAngle) / wireCount) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(wa) * 122, Math.sin(wa) * 122);
+                    ctx.lineTo(Math.cos(wa) * 142, Math.sin(wa) * 142);
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+
+            // ──── Middle metal ring ────
+            ctx.lineWidth = 7;
+            let mGrad = ctx.createLinearGradient(80, 370, 370, 80);
+            mGrad.addColorStop(0, "#444");
+            mGrad.addColorStop(0.5, "#5c5c5c");
+            mGrad.addColorStop(1, "#383838");
+            ctx.strokeStyle = mGrad;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 115, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Middle ring bevel
+            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = "rgba(200,240,255,0.09)";
+            ctx.beginPath(); ctx.arc(CX, CY, 119, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = "rgba(200,240,255,0.06)";
+            ctx.beginPath(); ctx.arc(CX, CY, 111, 0, Math.PI * 2); ctx.stroke();
+
+            // ──── 8 Radial energy beams/spokes ────
+            ctx.save();
+            ctx.translate(CX, CY);
+            ctx.rotate(-fastSpin);
+            for (let i = 0; i < 8; i++) {
+                let a = (i / 8) * Math.PI * 2;
+                let x1 = Math.cos(a) * 78;
+                let y1 = Math.sin(a) * 78;
+                let x2 = Math.cos(a) * 112;
+                let y2 = Math.sin(a) * 112;
+
+                // Dark beam body
+                ctx.strokeStyle = "#1a1a1a";
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                // Glowing edge
+                ctx.strokeStyle = `rgba(105,241,241,${0.15 * pulse})`;
+                ctx.lineWidth = 1;
+                ctx.shadowColor = "rgba(105,241,241,0.2)";
+                ctx.shadowBlur = 4;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Beam tip indicator — highlight the top beam specially
+                if (i === 0) {
+                    ctx.fillStyle = `rgba(105,241,241,${0.25 * pulse})`;
+                    ctx.beginPath();
+                    ctx.arc(x2, y2, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            ctx.restore();
+
+            // ──── Inner glow channel ────
+            ctx.lineWidth = 16;
+            ctx.strokeStyle = `rgba(105,241,241,${0.14 * pulse})`;
+            ctx.shadowColor = "rgba(105,241,241,0.25)";
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 95, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // ──── Inner core ring ────
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#3a3a3a";
+            ctx.beginPath();
+            ctx.arc(CX, CY, 78, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.strokeStyle = `rgba(105,241,241,${0.1 * pulse})`;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 78, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // ──── Core glow bloom ────
+            let coreGlow = ctx.createRadialGradient(CX, CY, 0, CX, CY, 65);
+            coreGlow.addColorStop(0, `rgba(255,255,255,${0.95 * pulse})`);
+            coreGlow.addColorStop(0.15, `rgba(232,250,255,${0.8 * pulse})`);
+            coreGlow.addColorStop(0.35, `rgba(126,220,240,${0.5 * pulse})`);
+            coreGlow.addColorStop(0.65, `rgba(58,184,216,${0.3 * pulse})`);
+            coreGlow.addColorStop(1, "rgba(26,104,128,0)");
+            ctx.fillStyle = coreGlow;
+            ctx.shadowColor = "rgba(105,241,241,0.5)";
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 65, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // ──── Dashed detail ring ────
+            ctx.save();
+            ctx.translate(CX, CY);
+            ctx.rotate(fastSpin * 0.3);
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = `rgba(105,241,241,${0.3 * pulse})`;
+            ctx.setLineDash([6, 4.5]);
+            ctx.beginPath();
+            ctx.arc(0, 0, 45, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // ──── Core bright center ────
+            let coreCenter = ctx.createRadialGradient(CX, CY, 0, CX, CY, 28);
+            coreCenter.addColorStop(0, "#ffffff");
+            coreCenter.addColorStop(0.5, `rgba(208,244,255,${pulse})`);
+            coreCenter.addColorStop(1, `rgba(128,224,240,${0.7 * pulse})`);
+            ctx.fillStyle = coreCenter;
+            ctx.shadowColor = "rgba(200,240,255,0.6)";
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 28, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // ──── Core hotspot ────
+            ctx.fillStyle = `rgba(255,255,255,${0.92 * pulse})`;
+            ctx.shadowColor = "rgba(255,255,255,0.4)";
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(CX, CY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            frame++;
+            requestAnimationFrame(drawReactor);
         }
         drawReactor();
 
