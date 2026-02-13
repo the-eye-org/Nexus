@@ -265,7 +265,7 @@
             document.body.innerHTML = "<h1 style='color:red'>ACCESS DENIED</h1>";
         }
 
-
+        document.cookie = "arc_reactor=unstable; path=/";
         (function () {
 
             function qx(z) {
@@ -275,7 +275,7 @@
                     ?.split("=")[1];
             }
 
-            if (qx("arc_reactor") !== "stable") return;
+            if (qx("arc_reactor") !== atob("c3RhYmxl")) return;
 
             const phantom = [3, 9, 27, 81];
             phantom.map(x => x * 7).filter(x => x % 5);
@@ -624,7 +624,6 @@
             let _correct = "3000";
 
             if (codeInput === _correct) {
-                document.cookie = "arc_reactor=unstable; path=/";
                 document.getElementById("tonyVerifyModal").style.display = "none";
 
                 let successModal = document.getElementById("successModal");
