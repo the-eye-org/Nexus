@@ -23,7 +23,7 @@ const HulkFinal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!flag.trim()) {
       setError('Please enter the flag');
       return;
@@ -35,7 +35,7 @@ const HulkFinal = () => {
     try {
       // Get API URL from environment or use default
       const API_URL = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-      
+
       // Submit to backend API with authentication
       const response = await axios.post(
         `${API_URL}/game/submit-flag`,
@@ -104,7 +104,7 @@ const HulkFinal = () => {
           </div>
           <h2 className="stone-name">⏰ TIME STONE ⏰</h2>
           <p className="stone-description">
-            The power to manipulate time itself. You've proven your intellect 
+            The power to manipulate time itself. You've proven your intellect
             and patience through the gamma radiation challenge.
           </p>
         </div>
@@ -135,7 +135,7 @@ const HulkFinal = () => {
         <p className="submission-info">
           Enter the final flag keyword to claim your Time Stone:
         </p>
-        
+
         <form onSubmit={handleSubmit} className="flag-form">
           <div className="flag-input-group">
             <input
@@ -147,8 +147,8 @@ const HulkFinal = () => {
               disabled={submitting || success}
               autoComplete="off"
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
               disabled={submitting || success}
             >
@@ -207,13 +207,8 @@ const HulkFinal = () => {
 
       {/* Navigation */}
       <div className="final-navigation">
-        <button 
-          className="nav-button secondary"
-          onClick={() => navigate('/leaderboard')}
-        >
-          📊 View Dashboard
-        </button>
-        <button 
+
+        <button
           className="nav-button primary"
           onClick={() => navigate('/challenges')}
         >

@@ -93,7 +93,7 @@ STAGE 2: The Stone
 
 ### **Example Journey: Thor Path**
 
-1. **Find Flag**: Player explores frontend, discovers `FLAG{BIFROST_GUARDIAN}` in code
+1. **Find Flag**: Player explores frontend, discovers `neXus{wr7hy_0f_mj0ln1r}` in code
 2. **Submit Flag**: 
    - Request: `POST /api/game/submit-flag` with flag
    - Response: `{"question": "What is the name of Thor's hammer?", "points_awarded": 100}`
@@ -127,7 +127,7 @@ STAGE 2: The Stone
 {
   _id: ObjectId,
   avenger: "thor",                              // Avenger identifier
-  flag_hash: "sha256_of_FLAG{BIFROST_GUARDIAN}", // SHA-256 hashed flag
+  flag_hash: "sha256_of_neXus{wr7hy_0f_mj0ln1r}", // SHA-256 hashed flag
   stone: "space",                                // Associated Infinity Stone
   
   // Stage 2 Components
@@ -217,7 +217,7 @@ STAGE 2: The Stone
 **Purpose**: Submit flag (Stage 1)  
 **Request**:
 ```json
-{"flag": "FLAG{ARC_REACTOR_CORE}"}
+{"flag": "neXus{t0ny_st4rk_1s_ir0nm4n}"}
 ```
 **Response (200) - Correct**:
 ```json
@@ -427,7 +427,7 @@ const flagResponse = await fetch('http://localhost:5000/api/game/submit-flag', {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`  // ← REQUIRED
   },
-  body: JSON.stringify({flag: 'FLAG{ARC_REACTOR_CORE}'})
+  body: JSON.stringify({flag: 'neXus{t0ny_st4rk_1s_ir0nm4n}'})
 });
 
 const result = await flagResponse.json();
@@ -449,11 +449,11 @@ console.log(result.question); // Display question to user
    Store token in localStorage
    
 3. FIND FLAG (Frontend exploration)
-   Player discovers: FLAG{ARC_REACTOR_CORE}
+   Player discovers: neXus{t0ny_st4rk_1s_ir0nm4n}
    
 4. SUBMIT FLAG
    POST /api/game/submit-flag
-   {"flag": "FLAG{ARC_REACTOR_CORE}"}
+   {"flag": "neXus{t0ny_st4rk_1s_ir0nm4n}"}
    Returns: {
      "question": "What element did Tony Stark synthesize?",
      "points_awarded": 100
