@@ -336,13 +336,13 @@ MAX_ATTEMPTS_QUESTION = 3
 COOLDOWN_MINUTES = 10
 
 # Avengers & Stones
-AVENGERS = ["ironman", "thor", "hulk", "captainamerica", "blackwidow", "hawkeye"]
+AVENGERS = ["ironman", "captainamerica", "thor", "deadpool", "hulk", "hawkeye"]
 STONE_MAPPING = {
     "ironman": "power",
-    "thor": "space",
-    "hulk": "mind",
     "captainamerica": "time",
-    "blackwidow": "soul",
+    "thor": "space",
+    "deadpool": "soul",
+    "hulk": "mind",
     "hawkeye": "reality"
 }
 ```
@@ -356,10 +356,10 @@ STONE_MAPPING = {
 | Avenger | Flag | Stone | Question | Answer |
 |---------|------|-------|----------|--------|
 | Iron Man | `FLAG{ARC_REACTOR_CORE}` | Power | What element did Tony Stark synthesize? | vibranium |
-| Thor | `FLAG{BIFROST_GUARDIAN}` | Space | What is Thor's hammer called? | mjolnir |
-| Hulk | `FLAG{GAMMA_RADIATION}` | Mind | Who created Ultron? | tony stark |
 | Captain America | `FLAG{SUPER_SOLDIER}` | Time | What is Cap's shield made of? | vibranium |
-| Black Widow | `FLAG{RED_ROOM_PROTOCOL}` | Soul | What is Black Widow's real name? | natasha romanoff |
+| Thor | `FLAG{BIFROST_GUARDIAN}` | Space | What is Thor's hammer called? | mjolnir |
+| Deadpool | `neXus{ch1m1ch4ng4s}` | Soul | What is Deadpool's favorite food? | chimichangas |
+| Hulk | `FLAG{GAMMA_RADIATION}` | Mind | Who created Ultron? | tony stark |
 | Hawkeye | `FLAG{NEVER_MISS}` | Reality | What happened to Hawkeye's family? | snapped |
 
 ---
