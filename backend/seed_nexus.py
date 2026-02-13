@@ -33,10 +33,10 @@ def main():
     
     print("\n🎯 Default Flags (FOR TESTING ONLY - CHANGE IN PRODUCTION):")
     print("   - Iron Man: FLAG{ARC_REACTOR_CORE}")
-    print("   - Thor: FLAG{BIFROST_GUARDIAN}")
-    print("   - Hulk: FLAG{GAMMA_RADIATION}")
     print("   - Captain America: FLAG{SUPER_SOLDIER}")
-    print("   - Black Widow: FLAG{RED_ROOM_PROTOCOL}")
+    print("   - Thor: FLAG{BIFROST_GUARDIAN}")
+    print("   - Deadpool: neXus{ch1m1ch4ng4s}")
+    print("   - Hulk: FLAG{GAMMA_RADIATION}")
     print("   - Hawkeye: FLAG{NEVER_MISS}")
     
     print("\n🚀 Ready to start backend with: python app.py")

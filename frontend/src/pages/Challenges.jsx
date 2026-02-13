@@ -31,9 +31,9 @@ const CHALLENGE_LINKS = {
   cap: '/nexus/captain_america/index.html',
   thor: '/nexus/thor/index.html',
   ironman: '/nexus/ironman/index.html',
-  deadpool: 'https://theye.psgtech.ac.in/nex-backend/wade/',
-  hawkeye: '/nexus/hawkeye/index.html',
-  hulk: null, // Hulk handled in-app, so no external static link
+  deadpool: '/nexus/deadpool/index.html',
+  hulk: null,
+  hawkeye: null,
 };
 
 const slideVariants = {
