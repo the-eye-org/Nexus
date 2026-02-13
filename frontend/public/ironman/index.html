@@ -3,198 +3,173 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Stark Systems – Fail-Safe Mode</title>
+    <title>Stark Systems – Iron Man</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Diagnostics required to stabilize Arc Reactor. Run diagnostic sequence. -->
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
 
-        body {
+        body,
+        html {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background-color: #000;
             font-family: 'Orbitron', sans-serif;
-            background: black;
+        }
+
+        /* The loading status shown behind the video */
+        #status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: #00eaff;
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            z-index: 5;
+            text-align: center;
+            opacity: 0.8;
         }
 
         #introVideo {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 999;
-            opacity: 1;
-            transition: opacity 1.5s ease-in-out;
-            background: black;
+            z-index: 10;
+            background: #000;
         }
 
-        #skipIntro {
+        #uiOverlay {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid #00eaff;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            display: none;
+            /* Only shown after video ends */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
             color: #00eaff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border-radius: 4px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background: radial-gradient(circle at center, rgba(0, 40, 60, 0.9), rgba(0, 0, 0, 1));
         }
 
-        #skipIntro.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .bg {
-            position: fixed;
+        #uiOverlay::before {
+            content: "";
+            position: absolute;
             inset: 0;
             background: url("arc_bg.jpg") center/cover no-repeat;
-            filter: brightness(0.35) saturate(1.4);
-            opacity: 0.3;
-            z-index: 1;
-        }
-
-        .scanlines {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(
-                rgba(0,255,255,0.03) 0px,
-                rgba(0,255,255,0.03) 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-            z-index: 2;
+            opacity: 0.2;
+            z-index: -1;
         }
 
         .container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 80%;
-            max-width: 800px;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            padding: 40px;
-            background: rgba(0, 30, 40, 0.3);
-            border: 1px solid #0ff;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 0 20px #0ff5, inset 0 0 20px #0ff4;
-            border-radius: 12px;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-            z-index: 3;
+            max-width: 600px;
+            padding: 50px;
+            border: 2px solid #00eaff;
+            background: rgba(0, 20, 30, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 234, 255, 0.5), inset 0 0 20px rgba(0, 234, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         h1 {
-            font-size: 2rem;
-            text-shadow: 0 0 10px #0ff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #00eaff;
+            letter-spacing: 3px;
         }
 
-        .story-text {
-            font-size: 1.05rem;
+        p {
+            font-size: 1.1rem;
             line-height: 1.6;
-            margin-top: 20px;
+            margin-bottom: 35px;
             color: #c8f7ff;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 2.5s ease, transform 2.5s ease;
         }
 
         .btn-start {
-            margin-top: 35px;
-            padding: 15px 35px;
-            font-size: 1.2rem;
-            border: 1px solid #00eaff;
+            padding: 18px 50px;
+            font-size: 1.3rem;
             color: #00eaff;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
+            border: 2px solid #00eaff;
+            background: rgba(0, 234, 255, 0.1);
             cursor: pointer;
             text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            letter-spacing: 4px;
+            transition: all 0.4s ease;
             text-shadow: 0 0 8px #00eaff;
         }
 
         .btn-start:hover {
             background: #00eaff;
-            color: black;
-            box-shadow: 0 0 20px #00eaff;
+            color: #000;
+            box-shadow: 0 0 40px #00eaff;
+            transform: scale(1.05);
         }
     </style>
 </head>
 
 <body>
 
+    <div id="status">JARVIS: INITIALIZING VIDEO FEED...</div>
+
     <video id="introVideo" autoplay muted playsinline preload="auto">
         <source src="intro_arc_start.mp4" type="video/mp4">
     </video>
 
-    <button id="skipIntro" onclick="skipIntro()">Skip Intro</button>
-
-    <div class="bg"></div>
-    <div class="scanlines"></div>
-
-    <!-- MAIN UI -->
-    <div class="container" id="mainUI">
-        <h1>STARK FAIL-SAFE MODE ACTIVATED</h1>
-
-        <div class="story-text" id="storyText">
-            <strong>Alert:</strong> Critical instability detected in the Arc Reactor.<br><br>
-            J.A.R.V.I.S has locked the main OS to prevent a reactor meltdown.
-            All primary systems are offline.<br><br>
-            Your mission:
-            Access Stark’s holographic interface and <b>stabilize the Arc Reactor before total system shutdown</b>.
+    <div id="uiOverlay">
+        <div class="container">
+            <h1>STARK FAIL-SAFE</h1>
+            <p>System instability detected in Arc Reactor core. Authorized personnel must stabilize manually.</p>
+            <button class="btn-start" onclick="location.href='ironman.html'">Begin Mission</button>
         </div>
-
-        <button class="btn-start" onclick="begin()">Begin Mission</button>
     </div>
 
     <script>
-        function begin() {
-            window.location.href = "ironman.html";
-        }
+        const video = document.getElementById('introVideo');
+        const overlay = document.getElementById('uiOverlay');
+        const status = document.getElementById('status');
 
-        const introVideo = document.getElementById("introVideo");
-        const skipBtn = document.getElementById("skipIntro");
+        // When video starts playing, hide the "Initializing" text
+        video.onplaying = () => {
+            status.style.display = 'none';
+            console.log("Video is playing.");
+        };
 
-        function skipIntro() {
-            const video = document.getElementById("introVideo");
-            const ui = document.getElementById("mainUI");
-            const story = document.getElementById("storyText");
+        // When video finishes, switch to the mission UI
+        video.onended = () => {
+            console.log("Video ended. Showing UI.");
+            video.style.display = 'none';
+            overlay.style.display = 'flex';
+        };
 
-            video.style.opacity = "0";
-            skipBtn.classList.remove("visible");
+        // If the video fails to load, skip straight to the UI so user isn't stuck
+        video.onerror = (e) => {
+            console.error("Video error detected:", e);
+            video.style.display = 'none';
+            overlay.style.display = 'flex';
+        };
 
-            setTimeout(() => {
-                video.style.display = "none";
-                ui.style.opacity = "1";
-
-                setTimeout(() => {
-                    story.style.opacity = "1";
-                    story.style.transform = "translateY(0)";
-                }, 500);
-
-                document.body.style.overflow = "auto";
-                document.body.style.height = "150vh";
-            }, 1500);
-        }
-
-        introVideo.onended = skipIntro;
-        introVideo.onerror = skipIntro;
-
-        setTimeout(() => {
-            skipBtn.classList.add("visible");
-        }, 2000);
+        // Aggressive play on load
+        window.addEventListener('load', () => {
+            video.play().catch(error => {
+                console.warn("Autoplay blocked. Waiting for interaction.", error);
+                // If blocked, a click anywhere will start it
+                window.addEventListener('click', () => {
+                    video.play();
+                }, { once: true });
+            });
+        });
     </script>
-
 </body>
+
 </html>
