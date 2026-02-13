@@ -1,0 +1,21 @@
+# S.H.I.E.L.D. Web Crawler Policy
+User-agent: *
+# Base-aware paths (app served under /nexus/)
+Disallow: /nexus/gamma-logs/
+# Fallback for root-served builds/dev
+Disallow: /gamma-logs/
+
+# Always allow access to this policy file
+Allow: /nexus/robots.txt
+Allow: /robots.txt
+
+# Explicit file access to guide analysts
+Allow: /nexus/gamma-logs/index.html
+Allow: /gamma-logs/index.html
+
+
+
+# Advisory: Classified metadata markers for forensic analysts
+# ROT13 marker: TNZZN_FZNFU
+# HEX marker: 4A 41 44 45 5F 43 52 55 53 48
+# Base64 marker: SkFERV9DUlVTSA==

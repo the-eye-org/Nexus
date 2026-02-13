@@ -43,10 +43,11 @@ const GammaWave = () => {
     if (trimmedInput === 'HULK') {
       setShowError(true);
       setErrorMessage('Too predictable. Try anger.');
-      setAttempts(prev => prev + 1);
+      const nextAttempts = attempts + 1;
+      setAttempts(nextAttempts);
       
-      // Show hint after first HULK attempt
-      if (attempts >= 0) {
+      // Show hint only after at least 2 failed attempts
+      if (nextAttempts >= 2) {
         setTimeout(() => {
           setShowHint(true);
         }, 2000);

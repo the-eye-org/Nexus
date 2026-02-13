@@ -2,11 +2,23 @@
 // Base: http://localhost:5000/api unless overridden by VITE_API_BASE
 const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:5000/api';
 
+function getStoredToken() {
+  try {
+    const raw = localStorage.getItem('nexus_auth');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.token || null;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function request(path, { method = 'GET', body, token } = {}) {
   const headers = {
     'Content-Type': 'application/json',
   };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const bearer = token || getStoredToken();
+  if (bearer) headers['Authorization'] = `Bearer ${bearer}`;
 
   const resp = await fetch(`${API_BASE}${path}`, {
     method,
@@ -46,10 +58,18 @@ export async function getTeamActivity(token) {
   return request('/leaderboard/activity', { method: 'GET', token });
 }
 
-export async function submitFlag(flag, token) {
+export async function getLeaderboard() {
+  // Public leaderboard: no token required
+  return request('/leaderboard/', { method: 'GET' });
+}
+
+export async function submitFlag(flagOrPayload, token) {
+  const body = typeof flagOrPayload === 'string'
+    ? { flag: flagOrPayload }
+    : flagOrPayload;
   return request('/game/submit-flag', {
     method: 'POST',
-    body: { flag },
+    body,
     token,
   });
 }
@@ -62,4 +82,12 @@ export async function submitAnswer(avenger, answer, token) {
   });
 }
 
-export const api = { signup, login, getTeamActivity, submitFlag, submitAnswer };
+export async function submitAdvancedFlag(finalFlag, token) {
+  return request('/game/submit-advanced-flag', {
+    method: 'POST',
+    body: { flag: finalFlag },
+    token,
+  });
+}
+
+export const api = { signup, login, getTeamActivity, getLeaderboard, submitFlag, submitAnswer, submitAdvancedFlag };

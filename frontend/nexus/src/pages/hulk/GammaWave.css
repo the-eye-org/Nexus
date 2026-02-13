@@ -357,7 +357,7 @@
   border: 2px solid #00ff00;
   border-radius: 10px;
   padding: 20px;
-  animation: fadeInGlow 1s ease;
+  animation: fadeInGlow 0.6s ease;
 }
 
 @keyframes fadeInGlow {
@@ -367,7 +367,7 @@
   }
   to {
     opacity: 1;
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.25);
   }
 }
 
@@ -376,7 +376,7 @@
 }
 
 .opacity-hint {
-  color: #00ff00;
+  color: #003300; /* Much darker green to reduce visibility */
   font-size: 1.2rem;
   font-weight: bold;
   text-align: center;
@@ -384,13 +384,14 @@
   padding: 15px;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 5px;
-  animation: opacityPulse 2s ease-in-out infinite;
+  /* Make hint extremely subtle and non-flickering */
+  opacity: 0.05;
+  text-shadow: none;
+  filter: contrast(0.7) brightness(0.7);
+  pointer-events: none;
 }
 
-@keyframes opacityPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
+/* Removed opacityPulse animation to avoid visible flicker */
 
 .hint-description {
   color: #88ff88;

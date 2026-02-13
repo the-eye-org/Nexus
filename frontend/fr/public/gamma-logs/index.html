@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gamma Logs</title>
+    <style>
+      body { background:#0a0f0a; color:#b6ffb6; font-family: Consolas, monospace; padding:24px; }
+      .box { border:1px solid #1aff1a; padding:16px; border-radius:8px; box-shadow:0 0 12px rgba(26,255,26,0.2) inset; }
+      h1 { margin:0 0 12px; font-size:20px; }
+      pre { white-space:pre-wrap; }
+      .muted { opacity:.7; }
+      .token { display:inline-block; padding:2px 6px; border:1px dashed #1aff1a; border-radius:4px; margin-left:6px; }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>Dr. Banner — Report Log</h1>
+      <pre>
+[Report-ID: GW-247]
+Timestamp: 2024-06-13T04:02:47Z
+System: Gamma Containment Array
+
+Event: Diagnostic banner emitted
+Note: Field teams must include the forensics token with the final flag.
+
+Token (accepted forms): <span class="token">BANNER247</span> or <span class="token">GW-247</span>
+      </pre>
+      <div class="muted">If you reached this page via robots.txt, you are on the right track.</div>
+      <div style="margin-top:16px">
+        <a id="returnLink" href="/gamma_wave" class="token" title="Return to the Gamma Wave analyzer">Return to Gamma Wave</a>
+        <span class="muted" style="margin-left:8px">or</span>
+        <button onclick="history.back()" class="token" title="Go back">Go Back</button>
+      </div>
+    </div>
+    <script>
+      (function(){
+        try {
+          var base = location.pathname.startsWith('/nexus/') ? '/nexus/' : '/';
+          var link = document.getElementById('returnLink');
+          if (link) link.href = base + 'gamma_wave';
+        } catch(e) {}
+      })();
+    </script>
+  </body>
+</html>

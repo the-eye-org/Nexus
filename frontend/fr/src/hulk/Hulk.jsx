@@ -61,7 +61,7 @@ const Hulk = () => {
     // Hide button after 2 seconds
     const timer = setTimeout(() => {
       setShowButton(false);
-    }, 2000);
+    }, 1400);
     
     setButtonTimer(timer);
   };
@@ -176,6 +176,7 @@ const Hulk = () => {
             💡 Try hovering over Gauge 3 when its value is between 65-75%
           </div>
         )}
+        {/* Advanced CTF path is gated and accessible from GammaWave after OSINT submission */}
       </div>
 
       {/* Footer */}

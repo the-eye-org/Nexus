@@ -26,6 +26,7 @@ def submit_flag():
     team = request.team
     data = request.get_json()
     flag = data.get("flag", "").strip()
+    osint_code = (data.get("osint_code", "") or "").strip()
     
     if not flag:
         return jsonify({"error": "Flag required"}), 400
@@ -39,29 +40,52 @@ def submit_flag():
         return jsonify({"success": False, "message": "Incorrect Flag"}), 400
         
     avenger = game_flag['avenger']
+
+    # Enforce OSINT token for specific challenges (e.g., Hulk)
+    required_codes = Config.OSINT_CODES.get(avenger, [])
+    if required_codes:
+        normalized = osint_code.upper()
+        if normalized not in required_codes:
+            log_activity(team['team_name'], "OSINT_FAIL", {"avenger": avenger})
+            return jsonify({
+                "error": "Forensics token required",
+                "hint": "Check robots.txt and gamma-logs; inspect response headers."
+            }), 400
     
     # 2. Check if already solved
     if avenger in team.get('solved_flags', []):
         return jsonify({"error": "Flag already submitted for this Avenger"}), 409
         
-    # 3. Update Team (Award Flag Points)
-    teams_collection.update_one(
-        {"team_name": team['team_name']},
-        {
-            "$addToSet": {"solved_flags": avenger},
-            "$inc": {"score": Config.POINTS_FLAG}
-        }
-    )
+    # 3. Update Team
+    # For Hulk, defer points until Advanced CTF completion.
+    if avenger == 'hulk':
+        teams_collection.update_one(
+            {"team_name": team['team_name']},
+            {
+                "$addToSet": {"solved_flags": avenger}
+            }
+        )
+    else:
+        teams_collection.update_one(
+            {"team_name": team['team_name']},
+            {
+                "$addToSet": {"solved_flags": avenger},
+                "$inc": {"score": Config.POINTS_FLAG}
+            }
+        )
     
     log_activity(team['team_name'], "FLAG_SUCCESS", {"avenger": avenger, "points": Config.POINTS_FLAG})
     
-    return jsonify({
+    resp = jsonify({
         "success": True, 
         "message": "Flag Accepted! Answer the Question to get the Stone.",
         "question": game_flag['question'],
         "points_awarded": Config.POINTS_FLAG,
         "avenger": avenger
-    }), 200
+    })
+    # OSINT-friendly header hint (non-critical)
+    resp.headers["X-Gamma-Fingerprint"] = "SkFERV9DUlVTSA=="  # base64 of JADE_CRUSH
+    return resp, 200
 
 @game_bp.route("/submit-answer", methods=["POST"])
 @strong_auth_required
@@ -95,24 +119,102 @@ def submit_answer():
         log_activity(team['team_name'], "QUESTION_FAIL", {"avenger": avenger})
         return jsonify({"success": False, "message": "Incorrect Answer"}), 400
         
-    # 4. Award Stone & Bonus Points
+    # 4. Award Stone & Bonus Points (except Hulk, which awards in Advanced CTF route)
+    if avenger == 'hulk':
+        # Record that the answer was correct but do not award points or stone yet
+        teams_collection.update_one(
+            {"team_name": team['team_name']},
+            {
+                "$addToSet": {
+                    "completed_avengers": avenger
+                }
+            }
+        )
+    else:
+        teams_collection.update_one(
+            {"team_name": team['team_name']},
+            {
+                "$addToSet": {
+                    "collected_stones": stone,
+                    "completed_avengers": avenger
+                },
+                "$inc": {"score": Config.POINTS_ANSWER}
+            }
+        )
+    
+    log_activity(team['team_name'], "STONE_ACQUIRED", {"avenger": avenger, "stone": stone})
+    
+    if avenger == 'hulk':
+        resp = jsonify({
+            "success": True,
+            "message": "Answer accepted. Proceed to Advanced CTF for final points.",
+            "stone": stone,
+            "points_awarded": 0
+        })
+    else:
+        resp = jsonify({
+            "success": True,
+            "message": f"{stone.upper()} STONE ACQUIRED!",
+            "stone": stone,
+            "total_stones": len(team.get('collected_stones', [])) + 1,
+            "points_awarded": Config.POINTS_ANSWER
+        })
+    # OSINT-friendly header hint (non-critical)
+    resp.headers["X-Gamma-Signature"] = "TNZZN_FZNFU"  # ROT13 of GAMMA_SMASH
+    return resp, 200
+
+@game_bp.route("/submit-advanced-flag", methods=["POST"])
+@strong_auth_required
+@limiter.limit("10 per minute")
+def submit_advanced_flag():
+    """
+    Final stage for Hulk: submit Advanced CTF flag to award points and stone,
+    then mark Hulk completed.
+    """
+    import hashlib
+
+    team = request.team
+    data = request.get_json()
+    final_flag = (data.get("flag", "") or "").strip()
+
+    if not final_flag:
+        return jsonify({"error": "Final flag required"}), 400
+
+    # Validate Hulk Advanced flag (hash compare for consistency)
+    advanced_flag_plain = "FLAG{HULK_GAMMA_MASTER_2026}"
+    advanced_hash = hashlib.sha256(advanced_flag_plain.encode("utf-8")).hexdigest()
+    submitted_hash = hashlib.sha256(final_flag.encode("utf-8")).hexdigest()
+    if submitted_hash != advanced_hash:
+        log_activity(team['team_name'], "ADV_FLAG_FAIL", {"avenger": "hulk"})
+        return jsonify({"success": False, "message": "Incorrect Final Flag"}), 400
+
+    # Require prior Hulk flag submission
+    if "hulk" not in team.get('solved_flags', []):
+        return jsonify({"error": "Submit Hulk flag first"}), 403
+
+    stone = Config.STONE_MAPPING["hulk"]
+    # Check if already collected
+    if stone in team.get('collected_stones', []):
+        return jsonify({"error": "Advanced CTF already completed"}), 409
+
+    # Award combined points and stone
     teams_collection.update_one(
         {"team_name": team['team_name']},
         {
             "$addToSet": {
                 "collected_stones": stone,
-                "completed_avengers": avenger
+                "completed_avengers": "hulk"
             },
-            "$inc": {"score": Config.POINTS_ANSWER}
+            "$inc": {"score": Config.POINTS_FLAG + Config.POINTS_ANSWER}
         }
     )
-    
-    log_activity(team['team_name'], "STONE_ACQUIRED", {"avenger": avenger, "stone": stone})
-    
-    return jsonify({
+
+    log_activity(team['team_name'], "ADV_FLAG_SUCCESS", {"avenger": "hulk", "points": Config.POINTS_FLAG + Config.POINTS_ANSWER})
+
+    resp = jsonify({
         "success": True,
-        "message": f"{stone.upper()} STONE ACQUIRED!",
+        "message": "Advanced CTF completed. Points awarded.",
         "stone": stone,
-        "total_stones": len(team.get('collected_stones', [])) + 1,
-        "points_awarded": Config.POINTS_ANSWER
-    }), 200
+        "points_awarded": Config.POINTS_FLAG + Config.POINTS_ANSWER
+    })
+    return resp, 200

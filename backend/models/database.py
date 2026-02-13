@@ -93,3 +93,24 @@ def seed_game_flags():
         )
     
     print(f"✅ Seeded {len(default_flags)} Avenger Flags & Questions.")
+
+# db.py - Add CTF flag to database
+
+def seed_ctf_data():
+    """Seed CTF challenge data"""
+    
+    # Create secrets table
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS secrets (
+            id INTEGER PRIMARY KEY,
+            flag TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    
+    # Insert CTF flag
+    db.execute("""
+        INSERT INTO secrets (flag) VALUES ('FLAG{HULK_GAMMA_MASTER_2026}')
+    """)
+    
+    print("✅ CTF data seeded")

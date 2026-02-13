@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TiLocationArrow } from 'react-icons/ti';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
+import { api } from '../api/client';
 
 const Leaderboard = () => {
-  const placeholderRows = [
-    { rank: 1, name: '—', points: '—' },
-    { rank: 2, name: '—', points: '—' },
-    { rank: 3, name: '—', points: '—' },
-    { rank: 4, name: '—', points: '—' },
-    { rank: 5, name: '—', points: '—' },
-  ];
+  const [rows, setRows] = useState([]);
+  const [status, setStatus] = useState('loading'); // loading | ok | error
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchLeaderboard() {
+      setStatus('loading');
+      const res = await api.getLeaderboard();
+      if (cancelled) return;
+      if (!res.ok) {
+        setStatus('error');
+        setError(res.error || 'Failed to load leaderboard');
+        setRows([]);
+        return;
+      }
+      const list = Array.isArray(res.data?.leaderboard) ? res.data.leaderboard : [];
+      const mapped = list.map((t, idx) => ({
+        rank: idx + 1,
+        name: t.team_name || '—',
+        points: typeof t.score === 'number' ? t.score : '—',
+      }));
+      setRows(mapped);
+      setStatus('ok');
+    }
+    fetchLeaderboard();
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <main className="relative min-h-screen w-screen overflow-x-hidden bg-marvel-black text-white selection:bg-marvel-red selection:text-white">
@@ -50,7 +72,13 @@ const Leaderboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {placeholderRows.map((row) => (
+                  {(rows.length ? rows : [
+                    { rank: 1, name: '—', points: '—' },
+                    { rank: 2, name: '—', points: '—' },
+                    { rank: 3, name: '—', points: '—' },
+                    { rank: 4, name: '—', points: '—' },
+                    { rank: 5, name: '—', points: '—' },
+                  ]).map((row) => (
                     <tr
                       key={row.rank}
                       className="hover:bg-white/5 transition-colors group"
@@ -73,8 +101,12 @@ const Leaderboard = () => {
             </div>
 
             <div className="p-4 bg-white/5 border-t border-white/10 flex items-center justify-center gap-2 text-white/40">
-              <div className="w-2 h-2 rounded-full bg-marvel-red animate-pulse" />
-              <span className="font-mono text-xs uppercase tracking-widest">System Status: Awaiting Data Feed</span>
+              <div className={`w-2 h-2 rounded-full ${status === 'ok' ? 'bg-green-500' : status === 'error' ? 'bg-red-500' : 'bg-marvel-red animate-pulse'}`} />
+              <span className="font-mono text-xs uppercase tracking-widest">
+                {status === 'ok' && 'System Status: Live'}
+                {status === 'loading' && 'System Status: Fetching Rankings'}
+                {status === 'error' && `System Status: ${error}`}
+              </span>
             </div>
           </div>
 
