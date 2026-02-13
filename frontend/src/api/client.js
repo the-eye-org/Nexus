@@ -1,6 +1,6 @@
 // Simple API client tailored to backend Flask routes
 // Base: http://localhost:5000/api unless overridden by VITE_API_BASE
-const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:5000/nex-backend/api';
 
 
 async function request(path, { method = 'GET', body, token } = {}) {

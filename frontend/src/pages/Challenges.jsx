@@ -31,7 +31,7 @@ const CHALLENGE_LINKS = {
   cap: '/nexus/captain_america/index.html',
   thor: '/nexus/thor/index.html',
   ironman: '/nexus/ironman/index.html',
-  deadpool: '/nexus/deadpool/index.html',
+  deadpool: 'https://theeye.psgtech.ac.in/nex-backend/wade/',
   hulk: null,
   hawkeye: '/nexus/hawkeye/index.html',
 };
@@ -71,11 +71,24 @@ const slideVariants = {
   }),
 };
 
+const VICTORY_LINES = [
+  '"Mission accomplished, agent."',
+  '"The flag is ours."',
+  '"Victory is within reach."',
+  '"Intel secured. Well done."',
+  '"You have found the key."',
+  '"The answers were always there."',
+  '"Classified data unlocked."',
+  '"Target objective complete."',
+];
+
 const Challenges = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [flagInput, setFlagInput] = useState('');
+  const [showVictory, setShowVictory] = useState(false);
+  const [victoryLine, setVictoryLine] = useState('');
   const { user } = useAuth();
 
   const goPrev = () => {
@@ -115,9 +128,17 @@ const Challenges = () => {
       alert(res.error || 'Submission failed');
       return;
     }
-    const msg = res.data?.message || 'Flag accepted';
-    // Do not show or use the question; only acknowledge success
-    alert(msg);
+    // Show victory popup with random movie line
+    const randomLine = VICTORY_LINES[Math.floor(Math.random() * VICTORY_LINES.length)];
+    setVictoryLine(randomLine);
+    setShowVictory(true);
+    setFlagInput('');
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+      setShowVictory(false);
+      closeChallenge();
+    }, 4000);
   };
 
   return (
@@ -269,6 +290,64 @@ const Challenges = () => {
       </div>
 
       <Footer />
+
+      {/* Victory Popup */}
+      <AnimatePresence>
+        {showVictory && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 50 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+          >
+            <div className="relative flex flex-col items-center justify-center gap-6 px-6">
+              {/* Main card */}
+              <div className="relative bg-gradient-to-br from-marvel-red via-[#8B0000] to-marvel-black border border-marvel-red border-opacity-50 rounded-2xl p-12 shadow-2xl max-w-lg text-center backdrop-blur-sm">
+                {/* Content */}
+                <div className="relative z-10">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                  >
+                    <h2 className="font-zentry text-4xl md:text-5xl font-black text-white uppercase mb-4 tracking-wider">
+                      FLAG ACCEPTED
+                    </h2>
+                  </motion.div>
+
+                  <div className="h-1 w-20 bg-gradient-to-r from-marvel-red to-transparent mx-auto mb-6" />
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="font-circular-web text-lg md:text-xl text-white/90 italic mb-6 font-light"
+                  >
+                    {victoryLine}
+                  </motion.p>
+
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                    className="flex gap-1 justify-center"
+                  >
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+                        className="w-2 h-2 bg-marvel-red rounded-full"
+                      />
+                    ))}
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Challenge Modal */}
       <AnimatePresence>
