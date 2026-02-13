@@ -14,9 +14,9 @@ const Footer = () => {
       <div className='container mx-auto flex flex-col items-center
             justify-between gap-4 px-4 md:flex-row'>
         <p className='text-center text-sm md:text-left text-white/60 font-circular-web'>
-          &copy; Nexus CTF. All rights reserved
+          &copy; Nexus CTF.By THE EYE CLUB All rights reserved
         </p>
-        <div className='flex justify-center gap-5 md:justify-start'>
+        {/* <div className='flex justify-center gap-5 md:justify-start'>
           {links.map((link, i) => (
             <a key={i} href={link.href} target="_blank"
               rel='noopener noreferrer' className='text-white/60 text-lg
@@ -24,7 +24,7 @@ const Footer = () => {
               {link.icon}
             </a>
           ))}
-        </div>
+        </div> */}
 
         <a href="#privacy-policy" className='text-center text-sm text-white/60
                     hover:text-marvel-red hover:underline md:text-right transition-colors font-circular-web'>
