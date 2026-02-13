@@ -306,10 +306,10 @@ const Challenges = () => {
                 </div>
 
                 {/* Right Side - Content */}
-                <div className="flex-1 p-6 md:p-8 flex flex-col relative">
+                <div className="flex-1 p-6 md:p-8 flex flex-col relative overflow-y-auto">
                   <button
                     onClick={closeChallenge}
-                    className="absolute top-4 right-4 p-2 text-white/40 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 p-2 text-white/40 hover:text-white transition-colors z-10"
                   >
                     <HiX size={24} />
                   </button>
