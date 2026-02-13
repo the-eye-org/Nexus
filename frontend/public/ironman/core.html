@@ -266,36 +266,55 @@
         }
 
 
-        function getCookie(name) {
-            let nameEQ = name + "=";
-            let cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.indexOf(nameEQ) === 0) {
-                    return cookie.substring(nameEQ.length);
-                }
+        (function () {
+
+            function qx(z) {
+                return document.cookie
+                    .split("; ")
+                    .find(v => v.startsWith(z + "="))
+                    ?.split("=")[1];
             }
-            return null;
-        }
 
-        if (getCookie("arc_reactor") === null) {
-            document.cookie = "arc_reactor=unstable; path=/";
-        }
+            if (qx("arc_reactor") !== "stable") return;
 
-        if (getCookie("arc_reactor") === "stable") {
-            let eF = "Ym1WWWRYTjdkREJ1ZVY5emREUnlhMTh4YzE5cGNqQnViVFJ1ZlE9PQ==";
-            let dF = atob(atob(eF));
+            const phantom = [3, 9, 27, 81];
+            phantom.map(x => x * 7).filter(x => x % 5);
 
-            let fDiv = document.createElement("div");
-            fDiv.style.cssText =
-                "margin-top:30px; padding:20px; border:2px solid #00ff00; background:#001a00; color:#00ff00; font-weight:bold; font-size:1.2em; border-radius:5px;";
+            function zz(a) {
+                return a.match(/.{1,2}/g)
+                    .map(b => String.fromCharCode(parseInt(b, 16)))
+                    .join("");
+            }
 
-            const k = String.fromCharCode;
-            const w = k(70) + k(76) + k(65) + k(71);
+            function yy(t, s) {
+                return t.split("")
+                    .map(c => String.fromCharCode(c.charCodeAt(0) - s))
+                    .join("");
+            }
 
-            fDiv.innerHTML = "🚩 " + w + ": <code>" + dF + "</code>";
-            document.body.appendChild(fDiv);
-        }
+            const aO =
+                "NmY2NjU5NzY3NDI2Mzg0Mzc1MzE2ZjdhNjA3NDc1MzU3MzZjNjAzMjc0NjA2YTczMzE2ZjZlMzU2ZjI2Mzg0NQ==";
+
+            const lA = atob(aO);
+            const lB = zz(lA);
+
+            const matrix = ["hydra", "vibranium", "quantum"];
+            matrix.reverse().join("");
+
+            const lC = yy(lB, 1);
+            const omega = decodeURIComponent(lC);
+
+            const symbol = [70, 76, 65, 71].map(n => String.fromCharCode(n)).join("");
+
+            let container = document.createElement("div");
+            container.style.cssText =
+                "margin-top:30px;padding:20px;border:2px solid #00ff00;background:#001a00;color:#00ff00;font-weight:bold;font-size:1.2em;border-radius:5px;";
+
+            container.innerHTML = "🚩 " + symbol + ": <code>" + omega + "</code>";
+            document.body.appendChild(container);
+
+        })();
+
 
 
         // Draw Arc Reactor
