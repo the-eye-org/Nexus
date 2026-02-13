@@ -8,7 +8,7 @@ import Login from './pages/Login.jsx'
 import Challenges from './pages/Challenges.jsx'
 import Hulk from './hulk/Hulk.jsx'
 import GammaWave from './hulk/GammaWave.jsx'
-import HulkAdvanced from './hulk/HulkAdvanced.jsx'
+import HulkAdvanced from './hulk/Hulkadvanced.jsx'
 
 const App = () => {
   return (
