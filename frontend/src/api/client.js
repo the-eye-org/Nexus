@@ -63,4 +63,8 @@ export async function submitAnswer(avenger, answer, token) {
   });
 }
 
-export const api = { signup, login, getTeamActivity, submitFlag, submitAnswer };
+export async function getLeaderboard() {
+  return request('/leaderboard', { method: 'GET' });
+}
+
+export const api = { signup, login, getTeamActivity, submitFlag, submitAnswer, getLeaderboard };

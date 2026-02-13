@@ -57,9 +57,9 @@ const Leaderboard = () => {
                     >
                       <td className="px-6 py-5">
                         <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-black font-zentry text-sm ${row.rank === 1 ? 'bg-yellow-500/20 text-yellow-500 ring-1 ring-yellow-500/50' :
-                            row.rank === 2 ? 'bg-zinc-400/20 text-zinc-400 ring-1 ring-zinc-400/50' :
-                              row.rank === 3 ? 'bg-amber-700/20 text-amber-700 ring-1 ring-amber-700/50' :
-                                'text-white/40'
+                          row.rank === 2 ? 'bg-zinc-400/20 text-zinc-400 ring-1 ring-zinc-400/50' :
+                            row.rank === 3 ? 'bg-amber-700/20 text-amber-700 ring-1 ring-amber-700/50' :
+                              'text-white/40'
                           }`}>
                           {row.rank}
                         </span>
