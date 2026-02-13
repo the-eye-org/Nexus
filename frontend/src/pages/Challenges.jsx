@@ -31,7 +31,7 @@ const CHALLENGE_LINKS = {
   cap: '/nexus/captain_america/index.html',
   thor: '/nexus/thor/index.html',
   ironman: '/nexus/ironman/index.html',
-  deadpool: '/nexus/deadpool/index.html',
+  deadpool: 'http://127.0.0.1:5000/nex-backend/wade/',
   bw: '/nexus/bw/index.html',
   hulk: null, // Hulk handled in-app, so no external static link
 };

@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext';
 const allNavItems = [
   { label: 'Home', to: '/' },
   { label: 'Challenges', to: '/challenges', authOnly: true },
-  { label: 'Leaderboard', to: '/leaderboard', authOnly: true },
+ // { label: 'Leaderboard', to: '/leaderboard', authOnly: true },
   // { label: 'About us', to: '/#about' },
   // { label: 'Contact', to: '/#contact' },
   { label: 'Login', to: '/login', guestOnly: true },
