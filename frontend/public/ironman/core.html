@@ -265,7 +265,7 @@
             document.body.innerHTML = "<h1 style='color:red'>ACCESS DENIED</h1>";
         }
 
-        document.cookie = "arc_reactor=unstable; path=/";
+
         (function () {
 
             function qx(z) {
@@ -584,6 +584,7 @@
             let y = e.clientY - rect.top;
 
             if (x >= 190 && x <= 210 && y >= 80 && y <= 120) {
+                document.cookie = "arc_reactor=unstable; path=/";
                 showVerificationModal();
             } else {
                 alert("Incorrect beam detected!");
