@@ -5,7 +5,9 @@ from config import Config
 from extensions import limiter
 from datetime import datetime
 import hashlib
+
 import re
+
 
 game_bp = Blueprint("game", __name__)
 
@@ -317,9 +319,7 @@ def hulk_ctf_stage():
             return jsonify({"success": False, "message": "Invalid JWT format."}), 400
 
         expected_jwt = (
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
-            "eyJ1c2VyIjoiYmFubmVyIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzcxMDA3MzAyfQ."
-            "ReA_DfP9Uco5PXDgHWWY6FVHkgvZAmuS3zeWZFwLCqI"
+           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYmFubmVyIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzcxMDUyMjM1fQ.TYamS1jIPakIgJzg7dEbn6rOSoXFPAOVa_meK4fksms"
         )
 
         if value != expected_jwt:
