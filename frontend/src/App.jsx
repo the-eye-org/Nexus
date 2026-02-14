@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
@@ -13,6 +14,7 @@ import HulkAdvanced from './hulk/Hulkadvanced.jsx'
 const App = () => {
   return (
     <AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <main className="relative min-h-screen w-screen overflow-x-hidden">
         <Navbar />
         <Routes>
@@ -20,31 +22,31 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/challenges" element={<ProtectedRoute><Challenges /></ProtectedRoute>} />
           <Route
-        path="/hulk"
-        element={
-          <ProtectedRoute>
-            <Hulk />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/gamma_wave"
-        element={
-          <ProtectedRoute>
-            <GammaWave />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/hulk/advanced"
-        element={
-          <ProtectedRoute>
-            <HulkAdvanced />
-          </ProtectedRoute>
-        }
-      />
-          
+            path="/hulk"
+            element={
+              <ProtectedRoute>
+                <Hulk />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/gamma_wave"
+            element={
+              <ProtectedRoute>
+                <GammaWave />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hulk/advanced"
+            element={
+              <ProtectedRoute>
+                <HulkAdvanced />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </main>
       <Footer />

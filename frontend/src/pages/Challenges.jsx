@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TiLocationArrow } from 'react-icons/ti';
 import { HiChevronLeft, HiChevronRight, HiX, HiLockClosed } from 'react-icons/hi';
+import toast from 'react-hot-toast';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
@@ -116,11 +117,11 @@ const Challenges = () => {
     e.preventDefault();
     const token = user?.token;
     if (!token) {
-      alert('You must be logged in to submit flags.');
+      toast.error('You must be logged in to submit flags.');
       return;
     }
     if (!flagInput.trim()) {
-      alert('Please enter a flag.');
+      toast.error('Please enter a flag.');
       return;
     }
     const isHulk = selectedChallenge?.id === 'hulk';
@@ -128,7 +129,7 @@ const Challenges = () => {
       ? await api.submitAdvancedFlag(flagInput.trim(), token)
       : await api.submitFlag(flagInput.trim(), token);
     if (!res.ok) {
-      alert(res.error || 'Submission failed');
+      toast.error(res.error || 'Submission failed');
       return;
     }
     // Show victory popup with random movie line
@@ -136,7 +137,7 @@ const Challenges = () => {
     setVictoryLine(randomLine);
     setShowVictory(true);
     setFlagInput('');
-    
+
     // Auto-dismiss after 4 seconds
     setTimeout(() => {
       setShowVictory(false);
@@ -285,7 +286,7 @@ const Challenges = () => {
               <Button
                 title="Abort Mission"
                 leftIcon={<TiLocationArrow className="rotate-[-135deg]" />}
-                containerClass="glass-panel !bg-transparent text-white hover:!bg-white/10"
+                containerClass="glass-panel !bg-transparent text-white hover:!bg-white/10 flex flex-row gap-3"
               />
             </Link>
           </div>
