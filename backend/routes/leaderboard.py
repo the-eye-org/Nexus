@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
 from models import teams_collection, analytics_collection, game_flags_collection
 from middleware import strong_auth_required
-from datetime import datetime
 
+from datetime import datetime
+ 
 leaderboard_bp = Blueprint("leaderboard", __name__)
 
 @leaderboard_bp.route("/", methods=["GET"])
