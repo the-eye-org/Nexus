@@ -32,7 +32,7 @@ const CHALLENGE_LINKS = {
   cap: '/nexus/captain_america/index.html',
   thor: '/nexus/thor/index.html',
   ironman: '/nexus/ironman/index.html',
-  deadpool: 'https://theeye.psgtech.ac.in/nex-backend/wade/',
+  deadpool: 'http://10.1.10.193:8006/nex-backend/wade/',
   hulk: null,
   hawkeye: '/nexus/hawkeye/index.html',
 };
