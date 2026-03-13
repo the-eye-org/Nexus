@@ -28,11 +28,11 @@ pipeline {
         stage('Stop Existing Container') {
             steps {
                 script {
-                    // Stop any container using port 8005
+                    // Stop any container using port 8007
                     sh '''
-                        CONTAINER_ID=$(docker ps -q --filter "publish=8005")
+                        CONTAINER_ID=$(docker ps -q --filter "publish=8007")
                         if [ ! -z "$CONTAINER_ID" ]; then
-                            echo "Stopping container on port 8005: $CONTAINER_ID"
+                            echo "Stopping container on port 8007: $CONTAINER_ID"
                             docker stop $CONTAINER_ID
                             docker rm $CONTAINER_ID
                         fi
@@ -54,7 +54,7 @@ pipeline {
                 sh """
                     docker run -d \
                         --name nexus-frontend \
-                        -p 8005:3000 \
+                        -p 8007:3000 \
                         --restart unless-stopped \
                         ${GHCR_REPO}:${IMAGE_TAG}
                 """
